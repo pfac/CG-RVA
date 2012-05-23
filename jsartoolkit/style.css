@@ -1,0 +1,9 @@
+body {
+	width:100%;
+}
+
+#cam_feed {
+	width: 640px;
+	margin: 0 auto;
+	border: 5px;
+}

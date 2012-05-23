@@ -16,33 +16,29 @@
 		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		<link rel="stylesheet" type="text/css" href="style.css" />
 		
 		<script type="text/javascript" src="camera-func.js"></script>
 	</head>
 
 	<body>
 		<script type="text/javascript" src="camera.js"></script>
-		<div>
+		<div id="content">
 			<header>
-				<h1>camera</h1>
+				<h1>Camera</h1>
 			</header>
+
 			<nav>
-				<p>
-					<a href="/">Home</a>
-				</p>
-				<p>
-					<a href="/contact">Contact</a>
-				</p>
+				<a href="/">Home</a>
+				<a href="/contact">Contact</a>
 			</nav>
 
-			<div>
-				<video id="webcam" width="320" height="240" autoplay="autoplay"></video>
+			<div id="cam_feed">
+				<video id="webcam" width="640" height="480" autoplay="autoplay" />
 			</div>
 
 			<footer>
-				<p>
-					&copy; Copyright  by RVA
-				</p>
+				<p>&copy; Copyright  by RVA</p>
 			</footer>
 		</div>
 	</body>
