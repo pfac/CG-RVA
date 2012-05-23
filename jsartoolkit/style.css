@@ -7,3 +7,10 @@ body {
 	margin: 0 auto;
 	border: 5px;
 }
+
+header,
+nav,
+footer {
+	width: 100%;
+	text-align: center;
+}

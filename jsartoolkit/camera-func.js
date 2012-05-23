@@ -1,6 +1,14 @@
 /**
  * @author RVA
  */
+
+var video
+
+function cameraInit() {
+	video = document.getElementById('webcam');
+	getUserMedia();
+}
+
 function getUserMedia () {
 	try {
 		navigator.webkitGetUserMedia({audio:false, video:true}, onUserMediaSuccess, onUserMediaError);
