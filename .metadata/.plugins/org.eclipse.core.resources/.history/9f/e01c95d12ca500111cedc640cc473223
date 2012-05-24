@@ -16,26 +16,7 @@ function uniGetUserMedia (type, onSuccess, onError) {
 
 
 
-function getUserMedia(element) {
-	var URL = window.URL || window.webkitURL;
-	var createObjectURL = URL.createObjectURL || webkitURL.createObjectURL;
-	
-	if (!createObjectURL)
-		throw new Error("URL.createObjectURL not found.");
-	
-	var onUserMediaSuccess = function (stream) {
-		console.log ("User has granted access to local media.");
-		var url = createObjectURL(stream);
-		console.log("Stream URL: "+url);
-		element.src = url;
-	};
-	
-	var onUserMediaError = function (error) {
-		var message = "Failed to get access to local media. Error code was " + error.code;
-		console.log(message);
-		alert(message);
-	}
-	
+function getUserMedia () {
 	try {
 		uniGetUserMedia({audio:false, video:true}, onUserMediaSuccess, onUserMediaError);
 		console.log("Requested access to local media with new syntax.");
@@ -48,4 +29,21 @@ function getUserMedia(element) {
 			console.log ("webkitGetUserMedia failed with exception: " + e.message);
 		}
 	}
+}
+
+
+
+/******************************************
+ * Events
+ */
+function onUserMediaSuccess (stream) {
+	console.log ("User has granted access to local media.");
+	var url = webkitURL.createObjectURL(stream);
+	webcam.src = url;
+}
+
+function onUserMediaError (error) {
+	var message = "Failed to get access to local media. Error code was " + error.code;
+	console.log(message);
+	alert(message);
 }

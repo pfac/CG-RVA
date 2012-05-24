@@ -17,25 +17,33 @@
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		
-		<script type="text/javascript" src="camera.js"></script>
-		<script type="text/javascript">
-			var video;
-			
-			/******************************************
-			 * Window Events
-			 */
-			window.onload = function () {
-				video = document.createElement("video");
-				video.width = 320;
-				video.height = 240;
-				//video.autoplay = true;
-				document.body.appendChild(video);
-				getUserMedia(video);
-				video.play();
-			}
-		</script>
+		<script type="text/javascript" src="camera-func.js"></script>
 	</head>
 
 	<body>
+		<script type="text/javascript" src="camera.js"></script>
+		<div>
+			<header>
+				<h1>camera</h1>
+			</header>
+			<nav>
+				<p>
+					<a href="/">Home</a>
+				</p>
+				<p>
+					<a href="/contact">Contact</a>
+				</p>
+			</nav>
+
+			<div>
+				<video id="webcam" width="320" height="240" autoplay="autoplay"></video>
+			</div>
+
+			<footer>
+				<p>
+					&copy; Copyright  by RVA
+				</p>
+			</footer>
+		</div>
 	</body>
 </html>

@@ -1,0 +1,8 @@
+/**
+ * @author RVA
+ */
+var video = document.getElementById("webcam");
+var canvas = document.getElementById("canvas_video")
+var raster = new NyARRgbRaster_Canvas2D(canvas);
+getUserMedia();
+

@@ -1,0 +1,17 @@
+/**
+ * @author RVA
+ */
+var video = document.getElementById("webcam");
+var canvasVideo = document.getElementById("canvas_video");
+var canvasOther = document.getElementById("canvas_other");
+var raster = new NyARRgbRaster_Canvas2D(canvas);
+var param = new FLARParam(320, 240);
+var matrix = new NyARTransMatResult();
+
+var detector = new FLARMultiIdMarkerDetector(param, 120);
+detector.setContinueMode(true);
+
+param.copyCameraMatrix(display.camera.perspectiveMatrix, 10, 10000);
+
+getUserMedia();
+

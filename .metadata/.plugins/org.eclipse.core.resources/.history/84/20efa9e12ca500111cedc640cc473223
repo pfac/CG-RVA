@@ -17,21 +17,28 @@
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		
-		<script type="text/javascript" src="camera.js"></script>
+		<script type="text/javascript" src="camera-func.js"></script>
 		<script type="text/javascript">
 			var video;
 			
-			/******************************************
-			 * Window Events
-			 */
 			window.onload = function () {
 				video = document.createElement("video");
-				video.width = 320;
-				video.height = 240;
-				//video.autoplay = true;
-				document.body.appendChild(video);
-				getUserMedia(video);
-				video.play();
+				getUserMedia();
+			}
+			
+			/******************************************
+			 * Events
+			 */
+			function onUserMediaSuccess (stream) {
+				console.log ("User has granted access to local media.");
+				var url = webkitURL.createObjectURL(stream);
+				webcam.src = url;
+			}
+			
+			function onUserMediaError (error) {
+				var message = "Failed to get access to local media. Error code was " + error.code;
+				console.log(message);
+				alert(message);
 			}
 		</script>
 	</head>

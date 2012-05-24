@@ -17,8 +17,7 @@
 		<link rel="shortcut icon" href="/favicon.ico" />
 		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 		
-		<script type="text/javascript" src="camera.js"></script>
-		<script type="text/javascript">
+		<script type="text/javascript" src="camera.js">
 			var video;
 			
 			/******************************************
@@ -33,6 +32,9 @@
 				getUserMedia(video);
 				video.play();
 			}
+		</script>
+		<script type="text/javascript">
+			
 		</script>
 	</head>
 

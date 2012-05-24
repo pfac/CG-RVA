@@ -25,6 +25,7 @@ function getUserMedia(element) {
 	
 	var onUserMediaSuccess = function (stream) {
 		console.log ("User has granted access to local media.");
+		
 		var url = createObjectURL(stream);
 		console.log("Stream URL: "+url);
 		element.src = url;

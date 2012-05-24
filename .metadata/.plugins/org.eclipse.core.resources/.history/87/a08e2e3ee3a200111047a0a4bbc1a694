@@ -1,0 +1,17 @@
+/**
+ * @author RVA
+ */
+function getUserMedia () {
+	try {
+		navigator.webkitGetUserMedia({audio:false, video:true}, onUserMediaSuccess, onUserMediaError);
+		console.log("Requested access to local media with new syntax.");
+	} catch (e) {
+		try {
+			navigator.webkitGetUserMedia("video,audio", onUserMediaSuccess, onUserMediaError);
+			console.log("Requested access to local media with old syntax.");
+		} catch (e) {
+			alert ("webkitGetUserMedia() failed. Is the MediaStream flag enabled in about:flags?");
+			console.log ("webkitGetUserMedia failed with exception: " + e.message);
+		}
+	}
+}

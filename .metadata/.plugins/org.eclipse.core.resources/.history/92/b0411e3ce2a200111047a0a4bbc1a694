@@ -1,0 +1,10 @@
+/**
+ * @author RVA
+ */
+function getUserMedia ()
+{
+	try
+	{
+		navigator.webkitGetUserMedia({audio:false, video:true},)
+	}
+}

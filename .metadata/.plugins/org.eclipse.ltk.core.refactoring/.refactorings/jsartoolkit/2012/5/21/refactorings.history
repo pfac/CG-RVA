@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename resource &apos;jsartoolkit/camera-func.js&apos; to &apos;camera.js&apos;" description="Rename resource &apos;camera-func.js&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="camera-func.js" name="camera.js" stamp="1337817084223" updateReferences="true"/>
+</session>

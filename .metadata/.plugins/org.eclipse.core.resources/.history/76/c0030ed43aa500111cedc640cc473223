@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+		<title>Basic Detector</title>
+		<meta name="description" content="" />
+		<meta name="author" content="RVA" />
+
+		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+
+		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+		
+		<script type="text/javascript" src="js/JSARToolKit.js"></script>
+		<script type="text/javascript" src="camera.js"></script>
+		<script type="text/javascript">
+			var canvas;
+			var param;
+			var raster;
+			var video;
+			
+			/******************************************
+			 * Window Events
+			 */
+			window.onload = function () {
+				video = document.createElement("video");
+				video.width = 320;
+				video.height = 240;
+				//video.autoplay = true;
+				document.body.appendChild(video);
+				getUserMedia(video);
+				video.play();
+	
+				canvas = document.createElement("canvas");
+				canvas.width = video.width;
+				canvas.height = video.height;
+				document.body.appendChild(canvas);
+				
+				raster = new NyARRgbRaster_Canvas2D(canvas);
+				
+				var p_mat = mat4.identity()
+				
+				param = new FLARParam(320, 240);
+				param.copyCameraMatrix(p_mat, 100, 10000);
+				
+				var result_mat = NyARTransMatResult();
+				
+				var detector = new FLARMultiIdMarkerDetector(param, 1);
+				detector.setContinueMode(true);
+				
+				/*
+				var display = new Magi.Scene(canvas);
+				param.copyCameraMatrix(display.camera.perspectiveMatrix, 100, 10000);
+				display.camera.useProjectionMatrix = true;
+				
+				var texture = new Magi.FlipFilterQuad();
+				texture.material.textures.Texture0 = new Magi.Texture();
+				texture.material.textures.Texture0.image = video;
+				texture.material.textures.Texture0.generateMipmaps = false;
+				
+				display.scene.appendChild(texture);
+				*/
+				
+				var context = canvas.getContext("2d");
+				context.fillStyle = "white";
+				context.fillRect(0, 0, 320, 240);
+				
+				setInterval(function() {
+					if (video.paused)
+						return;
+					if (window.paused)
+						return;
+					if (video.currentTime == lastTime)
+						return;
+					lastTime = video.currentTime;
+					
+					context.drawImage(video, 0, 0, 320, 240);
+					var datetime = new Date().getTime();
+					
+					canvas.changed = true;
+					
+					var time = new Date();
+					var detected = detector.detectMarkerLite(raster, 170);
+					for (var marker = 0; marker < detected; ++marker) {
+						var id = detector.getIdMarkerData(marker);
+						var currId;
+						if (id.packetLength > 4)
+							currId = -1;
+						else {
+							currId = 0;
+							for (var i = 0; i < id.packetLength; ++i) {
+								currId = (currId << 8) | id.getPacketData(i);
+							}
+						}
+						if (!pastResults[currId])
+							pastResults[currId] = {};
+						detector.getTransformMatrix(marker, result_mat);
+						pastResults[currId].age = 0;
+						pastResults[currId].transform = Object.asCopy(result_mat);
+						if (marker == 0)
+							times.push((new Date()) - t);	
+					}
+				})
+			}
+		</script>
+	</head>
+
+	<body>
+	</body>
+</html>
