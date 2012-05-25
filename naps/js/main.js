@@ -9,104 +9,119 @@ function include(filename) {
 	head.appendChild(script)
 }
 
-include('js/jquery-1.7.2.min.js')
-include('js/jcanvas.min.js')
-include('js/camera.js')
+include('js/jquery-1.7.2.min.js');
+include('js/jcanvas.min.js');
+include('js/camera.js');
+include('js/params.js');
 
 window.onload = onLoad;
 
 /********************
  * GLOBAL VARS
  *******************/
-var w, h
-var video
-var canvas
-var param
-var ctx
-var img
-var raster
-var detector
-var resultMat
 
+ function MyCanvas(id) {
+ 	this.id = id;
+ 	this.jcanvas  = $(id);
+ 	this.canvas   = this.jcanvas[0]
+ 	this.ctx = this.canvas.getContext("2d");
+
+ 	this.setSize = function(w, h) {
+ 		this.jcanvas.attr("width", w);
+ 		this.jcanvas.attr("height", h);
+ 	}
+
+ 	this.setSize(w, h);
+ }
+
+var _camera, _marker, _render_initial, _render_final
+var video;
+var marker_canvas;
+var render_initial_canvas;
+var render_final_canvas;
+var marker_ctx;
+
+var param;
+var raster;
+var detector;
+var resultMat;
+
+var ctx;
+var img;
 
 /********************
  * FUNCS
  *******************/
-
 function init() {
-	w = 300
-	h = 300
-	video = $('<video>', {id: 'video', width: w, height: h})[0]
-
-	$(video).css('background', 'blue')
-	$(video).appendTo('body')
-
+	// Initialize video feed
+	video = $('#camera_video')[0];
 	getUserMedia(video);
-	video.play()
+	video.play();
 
-	canvas = $("<canvas>", {
-			id: "canvas",
-			width: w,
-			height: h}
-	).appendTo("body")
-	canvas.attr("width", w)
-	canvas.attr("height", h)
+	// Create all the canvas
+	_camera         = new MyCanvas("#camera_feed");
+	_marker         = new MyCanvas("#marker_detection");
+	_render_initial = new MyCanvas("#render_initial");
+	_render_final   = new MyCanvas("#render_final");
 
-	canvas = canvas[0]
-
-	ctx       = canvas.getContext("2d")
-	param     = new FLARParam(w, h)
-	raster    = new NyARRgbRaster_Canvas2D(canvas)
-	detector  = new FLARMultiIdMarkerDetector(param, 80)
+	// JSARToolKit stuff
+	flar_param     = new FLARParam(w, h)
+	detector       = new FLARMultiIdMarkerDetector(flar_param, 80)
 	detector.setContinueMode(true)
 	resultMat = new NyARTransMatResult()
+
+	// Raster creation for marker detection from the camera canvas
+	raster    = new NyARRgbRaster_Canvas2D(_camera.canvas)
+}
+
+function updateDimesions() {
+	w = toInt($("#dim_width").text());
+	h = toInt($("#dim_height").text());
+
+	_camera.setSize(w, h);
+	_marker.setSize(w, h);
+	_render_initial.setSize(w, h);
+	_render_final.setSize(w, h);
 }
 
 function loadImg() {
 	img = new Image()
 	img.src = 'markers/0'// + toInt(Math.random() * 100).toString()
-	img.width = w
-	img.height = h
 }
 /////////////////////////////
 function render() {
 	//canvas.drawRect({x: 0, y: 0});
 
-	var dt = new Date().getTime()
-	ctx.drawImage(video, 0, 0, w, h)
-	canvas.changed = true
+	var dt = new Date().getTime();
+	_camera.ctx.drawImage(video, 0, 0, w, h);
+	_camera.canvas.changed = true;
 
-	var detect_count = detector.detectMarkerLite(raster, 80)
-	if (detect_count > 0) console.log(detect_count)
-	for(var idx = 0; idx < detect_count; ++idx) {
-		var id = detector.getIdMarkerData(idx)
+	_marker.ctx.fillStyle = "white";
+	_marker.ctx.fillRect(0, 0, w, h);
+	//_marker.ctx.drawImage(video, 0, 0, w, h);
 
-		// read data from i_code via Marsia--Marshal bla bla bla
-		var currId;
-		if (id.packetLength > 4) {
-			currId = -1
-		} else {
-			currId = 0
+	var detect_count = detector.detectMarkerLite(raster, 160);
 
-			for(var i = 0; i < id.packetLength; ++i) {
-				currId = (currId << 8) | id.getPacketData(i)
-			}
+	var ctx = _marker.ctx;
+	ctx.save();
+		ctx.translate(w/2, h/2);
+		ctx.strokeStyle = 'red';
+		var sc;
+		for(var idx = 0; idx < detect_count; ++idx) {
+			var id = detector.getIdMarkerData(idx);
+			var square = detector.getSquare(idx);
+
+			detector.getTransformMatrix(idx, resultMat);
+
+		ctx = _marker.ctx;
+		sc = 940 / resultMat.m23;
+		ctx.save();
+			ctx.scale(sc, sc);
+			ctx.transform(resultMat.m00, resultMat.m01, -resultMat.m10, -resultMat.m11, resultMat.m03*3/4, resultMat.m13*3/4);
+			ctx.strokeRect(-26, -26, 53, 53);
+		ctx.restore();
 		}
-
-		detector.getTransformMatrix(idx, resultMat)
-
-		ctx.save()
-			ctx.translate(150, 150)
-			var sc = 940 / resultMat.m23
-			ctx.scale(sc, sc)
-			ctx.transform(resultMat.m00, resultMat.m01, -resultMat.m10, -resultMat.m11, resultMat.m03*3/4, resultMat.m13*3/4)
-			ctx.fillStyle = 'red'
-			ctx.fillRect(-26, -26, 53, 53)
-			ctx.fillText(currId.toString(), -24, 24)
-			ctx.fillRect(-26, -26, 53, 53)
-			ctx.fillText(currId.toString(), -24, 24)
-		ctx.restore()
-	}
+	ctx.restore();
 }
 
 /*********************

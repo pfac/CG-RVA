@@ -12,5 +12,41 @@
 	</head>
 
 	<body>
+		<!-- Hidden video feed. We don't need to see this, since we already copy it to a canvas -->
+		<video id="camera_video" style="display:none" ></video>
+
+		<h1>The Stuff</h1>
+
+		<table id="main_table">
+			<tr>
+				<td>
+					<div id="camera_feed_div">
+						<p>Camera Feed</p>
+						<canvas id="camera_feed" />
+					</div>
+				</td>
+				<td>
+					<div id="marker_detection_div">
+						<p>Marker Detection</p>
+						<canvas id="marker_detection" />
+					</div>
+				</td>
+			</tr>
+
+			<tr>
+				<td>
+					<div id="render_initial_div">
+						<p>WebGL Render</p>
+						<canvas id="render_initial" />
+					</div>
+				</td>
+				<td>
+					<div id ="render_final_div">
+						<p>Final Render</p>
+						<canvas id="render_final" />
+					</div>
+				</td>
+			</tr>
+		</table>
 	</body>
 </html>

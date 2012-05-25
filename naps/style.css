@@ -1,5 +1,55 @@
-#video,
-#canvas,
-img {
-	border: solid 5px blue;
+
+/***************
+ * GLOBAL
+ **************/
+
+body {
+	font-family: "Consolas";
+	width: 100%;
+}
+
+h1 {
+	text-align: center;
+	margin: 0 auto;
+}
+
+/***************
+ * MAIN TABLE
+ **************/
+
+#main_table {
+	margin: 0 auto;
+}
+
+table p {
+	text-align: center;
+}
+
+/***************
+ * TABLE CONTENT
+ **************/
+
+#camera_feed_div,
+#marker_detection_div,
+#render_initial_div,
+#render_final_div {	
+}
+
+#camera_feed,
+#marker_detection,
+#render_initial,
+#render_final {
+	border: solid 1px;
+
+	/* pink color shown if something is wrong with canvas */
+	/*background-color: #FF00CC;*/
+}
+
+#main_table td {
+	padding: 10px 10px;
+}
+
+#main_table td p {
+	padding-top: 5px;
+	margin-bottom: 0;
 }
