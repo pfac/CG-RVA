@@ -75,28 +75,32 @@
 				}
 
 				for (var i in arMarkers) {
-					var marker = arMarkers[i];
-					if (marker.age > arMarkerAgeLimit) {
+					var r = arMarkers[i];
+					if (r.age > arMarkerAgeLimit) {
 						delete arMarkers[i];
-						scnAR.remove(marker.model);
-					} else {
-						if (!marker.model) {
-							var cubeGeo = new THREE.CubeGeometry(100,100,100);
-							var cubeMat = new THREE.MeshLambertMaterial({color:0xff0000});
-							var cube = new THREE.Mesh(cubeGeo, cubeMat);
-							cube.position.z = -50;
-							cube.doubleSided = true;
-
-							marker.model = new THREE.Object3D();
-							marker.model.matrixAutoUpdate = false;
-							marker.model.add(cube);
-
-							scnAR.add(marker.model);
-						}
-						copyMatrix(marker.transform, arMatTemp);
-						marker.model.matrix.setFromArray(arMatTemp);
-						marker.model.matrixWorldNeedsUpdate = true;
+						scnAR.remove(r.model);
 					}
+					r.age++;
+				}
+
+				for (var i in arMarkers) {
+					var marker = arMarkers[i];
+					if (!marker.model) {
+						var cubeGeo = new THREE.CubeGeometry(100,100,100);
+						var cubeMat = new THREE.MeshLambertMaterial({color:0xff0000});
+						var cube = new THREE.Mesh(cubeGeo, cubeMat);
+						cube.position.z = -50;
+						cube.doubleSided = true;
+
+						marker.model = new THREE.Object3D();
+						marker.model.matrixAutoUpdate = false;
+						marker.model.add(cube);
+
+						scnAR.add(marker.model);
+					}
+					copyMatrix(marker.transform, arMatTemp);
+					marker.model.matrix.setFromArray(arMatTemp);
+					marker.model.matrixWorldNeedsUpdate = true;
 				}
 
 				renderer.autoClear = false;
