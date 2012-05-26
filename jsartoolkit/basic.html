@@ -102,7 +102,7 @@
 				renderer.autoClear = false;
 				renderer.clear();
 				renderer.render(scnVideo, camVideo);
-				renderer.getContext().clearDepth(1.0);
+				renderer.clear(0x0, 0xffffffff, 0x0);
 				renderer.render(scnAR, camAR);
 			}
 
