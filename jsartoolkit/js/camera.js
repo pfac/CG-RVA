@@ -17,9 +17,15 @@ function uniGetUserMedia (type, onSuccess, onError) {
 
 
 function getUserMedia(element) {
+	var URL = window.URL || window.webkitURL;
+	var createObjectURL = URL.createObjectURL || webkitURL.createObjectURL;
+	
+	if (!createObjectURL)
+		throw new Error("URL.createObjectURL not found.");
+	
 	var onUserMediaSuccess = function (stream) {
 		console.log ("User has granted access to local media.");
-		var url = webkitURL.createObjectURL(stream);
+		var url = createObjectURL(stream);
 		console.log("Stream URL: "+url);
 		element.src = url;
 	};

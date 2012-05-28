@@ -1,127 +1,246 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 	<head>
 		<meta charset="utf-8" />
 
-		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
-		Remove this if you use the .htaccess -->
-		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
-
 		<title>Basic Detector</title>
-		<meta name="description" content="" />
-		<meta name="author" content="RVA" />
 
-		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
-
-		<!-- Replace favicon.ico & apple-touch-icon.png in the root of your domain and delete these references -->
-		<link rel="shortcut icon" href="/favicon.ico" />
-		<link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-		
+		<!--    LIBRARIES    -->
 		<script type="text/javascript" src="js/JSARToolKit.js"></script>
-		<script type="text/javascript" src="camera.js"></script>
-		<script type="text/javascript">
-			var canvas;
-			var param;
-			var raster;
-			var video;
-			
-			/******************************************
-			 * Window Events
+		<script type="text/javascript" src="js/Three.js"></script>
+
+		<!--    MY JS FILES    -->
+		<script type="text/javascript" src="js/camera.js"></script>
+
+		<!--    MY JS GLOBALS    -->
+		<script id="jsGlobals" type="text/javascript"><!--
+			var frameGapInMillis = 16;
+
+			var renderer;
+
+			var video;//< element to show the webcam stream
+			var camVideo;//< WebGL camera to place the video as background
+			var cnvsVideo;//< canvas for the video stream
+			var scnVideo;//< 3D scene with the video as background
+			var texVideo;//< texture to hold the video images
+
+			var arDetector;
+			var arMarkers;//< markers cache array
+			var arMarkerAgeLimit = frameGapInMillis;
+			var arMatResult;
+			var arMatTemp;
+			var arRaster;
+			var arThreshold = 100;
+
+			var camAR;//< WebGL camera according to the webcam
+			var scnAR;//< 3D scene with the augmented reality
+// -->	</script>
+
+		<!--    MY JS FUNCTIONS    -->
+		<script id="jsMyFunctions" type="text/javascript"><!--
+			function windowFrame () {
+				if (video.ended || video.paused || window.paused)
+					return;
+				
+				cnvsVideo.getContext("2d").drawImage(video, 0, 0, video.width, video.height);
+				cnvsVideo.changed = true;
+
+				texVideo.needsUpdate = true;
+
+				//	analyze the image and detect the markers
+				var detected = arDetector.detectMarkerLite(arRaster, arThreshold);
+				// console.log(detected);
+
+				//	identify the markers
+				for (var i = 0; i < detected; ++i) {
+					var id = arDetector.getIdMarkerData(i);
+					var current;
+					if (id.packetLength > 4)
+						current = -1;
+					else {
+						current = 0;
+						for (var j = 0; j < id.packetLength; ++j)
+							current = (current << 8) | id.getPacketData(j);
+					}
+
+					if (!arMarkers[current])
+						arMarkers[current] = {};
+					
+					// get transformation matrix
+					arDetector.getTransformMatrix(i, arMatResult);
+
+					// update marker info
+					arMarkers[current].age = 0;
+					arMarkers[current].transform = Object.asCopy(arMatResult);
+				}
+
+				for (var i in arMarkers) {
+					var r = arMarkers[i];
+					if (r.age > arMarkerAgeLimit) {
+						delete arMarkers[i];
+						scnAR.remove(r.model);
+					}
+					r.age++;
+				}
+
+				for (var i in arMarkers) {
+					var marker = arMarkers[i];
+					if (!marker.model) {
+						var cubeGeo = new THREE.CubeGeometry(100,100,100);
+						var cubeMat = new THREE.MeshLambertMaterial({color:0xff0000});
+						var cube = new THREE.Mesh(cubeGeo, cubeMat);
+						cube.position.z = -50;
+						cube.doubleSided = true;
+
+						marker.model = new THREE.Object3D();
+						marker.model.matrixAutoUpdate = false;
+						marker.model.add(cube);
+
+						scnAR.add(marker.model);
+					}
+					copyMatrix(marker.transform, arMatTemp);
+					marker.model.matrix.setFromArray(arMatTemp);
+					marker.model.matrixWorldNeedsUpdate = true;
+				}
+
+				renderer.autoClear = false;
+				renderer.clear();
+				renderer.render(scnVideo, camVideo);
+				renderer.clear(0x0, 0xffffffff, 0x0);
+				renderer.render(scnAR, camAR);
+			}
+
+
+
+
+
+
+			/************************************
+			 *	Window Events
 			 */
 			window.onload = function () {
+				//	webcam video
 				video = document.createElement("video");
 				video.width = 320;
 				video.height = 240;
-				//video.autoplay = true;
+				video.autoplay = true;
+					getUserMedia(video);
+
+				//	canvas for the video
+				cnvsVideo = document.createElement("canvas");
+				cnvsVideo.id = "cnvsVideo";
+				cnvsVideo.width = video.width;
+				cnvsVideo.height = video.height;
+
+				//	array to temporary hold the matrix data
+				arMatTemp = new Float32Array(16);
+
+				//	matrix to hold the resulting matrices
+				arMatResult = new NyARTransMatResult();
+
+				//	bitmap wrapper for analysis
+				arRaster = new NyARRgbRaster_Canvas2D(cnvsVideo);
+
+				//	parameter wrapper for the detector
+				var arParam = new FLARParam(video.width, video.height);
+				arParam.copyCameraMatrix(arMatTemp, 1, 2000);
+
+				//	detector to identify the markers
+				arDetector = new FLARMultiIdMarkerDetector(arParam, arThreshold);
+				arDetector.setContinueMode(true);
+
+				/***************************************
+				 * 3D rendering
+				 */
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize(video.width, video.height);
+				renderer.setClearColorHex(0x777777, 1.0);
+
+				//	Video scene
+					//	texture with the video image
+					texVideo = new THREE.Texture(cnvsVideo);
+
+					//	billboard - geometry
+					var bbGeo = new THREE.PlaneGeometry(2, 2, 0);
+
+					//	billboard - material
+					var bbMat = new THREE.MeshBasicMaterial({map:texVideo});
+
+					//	billboard plane
+					var bbPlane = new THREE.Mesh(bbGeo, bbMat);
+					bbPlane.rotation.x += Math.PI / 2;
+					bbPlane.depthTest = false;
+					bbPlane.depthWrite = false;
+
+					//	camera (default)
+					camVideo = new THREE.Camera();
+
+					//	the scene object
+					scnVideo = new THREE.Scene();
+					scnVideo.add(bbPlane);
+					scnVideo.add(camVideo);
+
+				//	Augmented reality scene
+					//	light point 1
+					var lightPoint1 = new THREE.PointLight(0xffffff, 2.0);
+					lightPoint1.position.set(400, 500, 100);
+
+					//	light point 2
+					// var lightPoint2 = new THREE.PointLight(0xffffff);
+					// lightPoint2.position.set(-400, 500, -100);
+
+					//	camera (set by the JSARToolKit lib)
+					camAR = new THREE.Camera();
+					camAR.projectionMatrix.setFromArray(arMatTemp);
+
+					//	the scene object
+					scnAR = new THREE.Scene();
+					scnAR.add(lightPoint1);
+					// scnAR.add(lightPoint2);
+					scnAR.add(camAR);
+				
+				//	initialize the markers array
+				arMarkers = {};
+
+				//	add visual elements
 				document.body.appendChild(video);
-				getUserMedia(video);
-				video.play();
-	
-				canvas = document.createElement("canvas");
-				canvas.width = video.width;
-				canvas.height = video.height;
-				document.body.appendChild(canvas);
-				
-				raster = new NyARRgbRaster_Canvas2D(canvas);
-				
-				var p_mat = mat4.identity()
-				
-				param = new FLARParam(320, 240);
-				param.copyCameraMatrix(p_mat, 100, 10000);
-				
-				var result_mat = NyARTransMatResult();
-				
-				var detector = new FLARMultiIdMarkerDetector(param, 1);
-				detector.setContinueMode(true);
-				
-				/*
-				var display = new Magi.Scene(canvas);
-				param.copyCameraMatrix(display.camera.perspectiveMatrix, 100, 10000);
-				display.camera.useProjectionMatrix = true;
-				
-				var texture = new Magi.FlipFilterQuad();
-				texture.material.textures.Texture0 = new Magi.Texture();
-				texture.material.textures.Texture0.image = video;
-				texture.material.textures.Texture0.generateMipmaps = false;
-				
-				display.scene.appendChild(texture);
-				*/
-				
-				var context = canvas.getContext("2d");
-				context.fillStyle = "white";
-				context.fillRect(0, 0, 320, 240);
-				
-				setInterval(function() {
-					if (video.paused)
-						return;
-					if (window.paused)
-						return;
-					if (video.currentTime == lastTime)
-						return;
-					lastTime = video.currentTime;
-					
-					context.drawImage(video, 0, 0, 320, 240);
-					var datetime = new Date().getTime();
-					
-					canvas.changed = true;
-					
-					var time = new Date();
-					var detected = detector.detectMarkerLite(raster, 170);
-					for (var marker = 0; marker < detected; ++marker) {
-						var id = detector.getIdMarkerData(marker);
-						var currId;
-						if (id.packetLength > 4)
-							currId = -1;
-						else {
-							currId = 0;
-							for (var i = 0; i < id.packetLength; ++i) {
-								currId = (currId << 8) | id.getPacketData(i);
-							}
-						}
-						if (!pastResults[currId])
-							pastResults[currId] = {};
-						detector.getTransformMatrix(marker, result_mat);
-						pastResults[currId].age = 0;
-						pastResults[currId].transform = Object.asCopy(result_mat);
-						if (marker == 0)
-							times.push((new Date()) - t);	
-					}
-					
-					for (var i in pastResults) {
-						var r = pastResults[i];
-						if (r.age > 5) delete pastResults[i];
-						r.age++;
-					}
-					
-					for (var i in cubes)
-						cubes[i].display = false;
-					
-					for (var i in pastResults) {
-						if (!cubes[i])
-					}
-				})
+				document.body.appendChild(cnvsVideo);
+				document.body.appendChild(renderer.domElement);
+
+				window.setInterval(windowFrame, frameGapInMillis);
 			}
-		</script>
+// -->	</script>
+
+		<!--    OTHER PEOPLE JS FUNCTIONS -->
+		<script id="jsFunctions" type="text/javascript"><!--
+			THREE.Matrix4.prototype.setFromArray = function(m) {
+				return this.set(
+					m[0], m[4], m[8], m[12],
+					m[1], m[5], m[9], m[13],
+					m[2], m[6], m[10], m[14],
+					m[3], m[7], m[11], m[15]
+				);
+			};
+
+			function copyMatrix(mat, cm) {
+				cm[0] = mat.m00;
+				cm[1] = -mat.m10;
+				cm[2] = mat.m20;
+				cm[3] = 0;
+				cm[4] = mat.m01;
+				cm[5] = -mat.m11;
+				cm[6] = mat.m21;
+				cm[7] = 0;
+				cm[8] = -mat.m02;
+				cm[9] = mat.m12;
+				cm[10] = -mat.m22;
+				cm[11] = 0;
+				cm[12] = mat.m03;
+				cm[13] = -mat.m13;
+				cm[14] = mat.m23;
+				cm[15] = 1;
+			}
+// -->	</script>
 	</head>
 
 	<body>
