@@ -89,7 +89,14 @@
 						cancel = false;
 						if (r.pokemon) {
 							var f = THREE.Math.random16();
-							if (f < r.pokemon.catch_rate) {
+							if (r.pokemon.broke_free) {
+								if (f < r.pokemon.chance) {
+									console.log(r.pokemon.name + " fled.");
+									r.pokemon.showing = false;
+									scnAR.remove(r.model);
+									delete arMarkers[i];
+								}
+							} else if (f < r.pokemon.catch_rate) {
 								console.log("Congratulations. " + r.pokemon.name + " has been caught.");
 								r.pokemon.showing = false;
 								scnAR.remove(r.model);
@@ -103,15 +110,15 @@
 						} else
 							delete arMarkers[i];
 					} else if (r.pokemon) {
-						if (!r.pokemon.broke_free)
-							r.age++;
+						// if (!r.pokemon.broke_free)
+							// r.age++;
 						if (r.idle > arMarkerAgeLimit && THREE.Math.random16() < r.pokemon.chance) {
 							console.log(r.pokemon.name + " fled.");
 							r.pokemon.showing = false;
 							scnAR.remove(r.model);
 							delete arMarkers[i];
 						}
-					} else
+					}
 						r.age++;
 				}
 
