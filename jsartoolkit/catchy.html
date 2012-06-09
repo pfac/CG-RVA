@@ -72,6 +72,10 @@
 
 					// update marker info
 					arMarkers[current].age = 0;
+					if (arMarkers[current].idle === undefined)
+						arMarkers[current].idle = 0;
+					else
+						arMarkers[current].idle++;
 					arMarkers[current].transform = Object.asCopy(arMatResult);
 					if (arMarkers[current].pokemon)
 						arMarkers[current].pokemon.broke_free = false;
@@ -87,6 +91,7 @@
 							var f = THREE.Math.random16();
 							if (f < r.pokemon.catch_rate) {
 								console.log("Congratulations. " + r.pokemon.name + " has been caught.");
+								r.pokemon.showing = false;
 								scnAR.remove(r.model);
 								delete arMarkers[i];
 							} else if (f > (1 - r.pokemon.catch_rate)) {
@@ -97,10 +102,16 @@
 								console.log(r.pokemon.name + "'s pokeball is shaking.");
 						} else
 							delete arMarkers[i];
-					} else if (r.pokemon)
+					} else if (r.pokemon) {
 						if (!r.pokemon.broke_free)
 							r.age++;
-					else
+						if (r.idle > arMarkerAgeLimit && THREE.Math.random16() < r.pokemon.chance) {
+							console.log(r.pokemon.name + " fled.");
+							r.pokemon.showing = false;
+							scnAR.remove(r.model);
+							delete arMarkers[i];
+						}
+					} else
 						r.age++;
 				}
 
@@ -111,8 +122,9 @@
 					if (!marker.model) {
 						var pokeNo = THREE.Math.randInt(1, pokeDB.length - 1);
 						var pokemon = pokeDB[pokeNo];
-						if (THREE.Math.random16() < pokemon.chance) {
+						if (!pokemon.showing && THREE.Math.random16() < pokemon.chance) {
 							console.log("A wild " + pokemon.name + " appeared.");
+							pokemon.showing = true;
 							marker.pokemon = pokemon;
 
 							var planeGeo = new THREE.PlaneGeometry(100, 100, 0);
@@ -158,8 +170,8 @@
 
 				//	webcam video
 				video = document.createElement("video");
-				video.width = 320;
-				video.height = 240;
+				video.width = 640;
+				video.height = 480;
 				video.autoplay = true;
 					getUserMedia(video);
 
@@ -247,8 +259,8 @@
 				renderer.domElement.style.cssText = "-webkit-transform: scale(-1,1);";
 
 				//	add visual elements
-				document.body.appendChild(video);
-				document.body.appendChild(cnvsVideo);
+				// document.body.appendChild(video);
+				// document.body.appendChild(cnvsVideo);
 				document.body.appendChild(renderer.domElement);
 
 				window.setInterval(windowFrame, frameGapInMillis);
