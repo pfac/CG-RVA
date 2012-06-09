@@ -115,18 +115,18 @@
 							console.log("A wild " + pokemon.name + " appeared.");
 							marker.pokemon = pokemon;
 
-							var cubeGeo = new THREE.CubeGeometry(100,100,100);
-							var cubeTex = new THREE.ImageUtils.loadTexture("images/" + pokemon.name.toLowerCase() + ".png");
-							//var cubeMat = new THREE.MeshLambertMaterial({color:0xff0000});
-							var cubeMat = new THREE.MeshLambertMaterial({map:cubeTex});
-							var cube = new THREE.Mesh(cubeGeo, cubeMat);
-							cube.position.z = -50;
-							cube.doubleSided = true;
-							cube.overdraw = true;
+							var planeGeo = new THREE.PlaneGeometry(100, 100, 0);
+							var planeTex = new THREE.ImageUtils.loadTexture("images/" + pokemon.name.toLowerCase() + ".png");
+							var planeMat = new THREE.MeshLambertMaterial({map:planeTex});
+							var plane = new THREE.Mesh(planeGeo, planeMat);
+							plane.rotation.x += Math.PI / 2;
+							plane.doubleSided = true;
+							plane.overdraw = true;
 
 							marker.model = new THREE.Object3D();
 							marker.model.matrixAutoUpdate = false;
-							marker.model.add(cube);
+							// marker.model.add(cube);
+							marker.model.add(plane);
 
 							scnAR.add(marker.model);
 						}
@@ -242,6 +242,9 @@
 				
 				//	initialize the markers array
 				arMarkers = {};
+
+				//	flip renderer canvas horizontally
+				renderer.domElement.style.cssText = "-webkit-transform: scale(-1,1);";
 
 				//	add visual elements
 				document.body.appendChild(video);
