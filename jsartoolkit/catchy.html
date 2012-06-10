@@ -265,10 +265,17 @@
 				//	flip renderer canvas horizontally
 				renderer.domElement.style.cssText = "-webkit-transform: scale(-1,1);";
 
+				//	background music
+				var audio = document.createElement("audio");
+				audio.loop = true;
+				audio.autoplay = true;
+				audio.src = "audio/pikachu.ogg";
+
 				//	add visual elements
 				// document.body.appendChild(video);
 				// document.body.appendChild(cnvsVideo);
 				document.body.appendChild(renderer.domElement);
+				document.body.appendChild(audio);
 
 				window.setInterval(windowFrame, frameGapInMillis);
 			}
