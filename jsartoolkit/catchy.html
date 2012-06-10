@@ -36,10 +36,28 @@
 
 			var camAR;//< WebGL camera according to the webcam
 			var scnAR;//< 3D scene with the augmented reality
+
+			var limFled = arMarkerAgeLimit;
+			var limShaking = 10;
 // -->	</script>
 
 		<!--    MY JS FUNCTIONS    -->
 		<script id="jsMyFunctions" type="text/javascript"><!--
+			function markerSetImage (markerIndex, imgName) {
+				var marker = arMarkers[markerIndex];
+				
+				marker.model.remove(marker.plane);
+
+				var plnTex = new THREE.ImageUtils.loadTexture("images/" + imgName.toLowerCase() + ".png");
+				var plnMat =  new THREE.MeshLambertMaterial({map:plnTex});
+				marker.plane = new THREE.Mesh(marker.geometry, plnMat);
+				marker.plane.rotation.x += Math.PI / 2;
+				marker.plane.doubleSided = true;
+				marker.plane.overdraw = true;
+
+				marker.model.add(marker.plane);
+			}
+
 			function windowFrame () {
 				if (video.ended || video.paused || window.paused)
 					return;
@@ -64,97 +82,197 @@
 							current = (current << 8) | id.getPacketData(j);
 					}
 
-					if (!arMarkers[current])
+					//	green arrows
+					if (arMarkers[current] === undefined) {
 						arMarkers[current] = {};
+						arMarkers[current].state = 1;
+						arMarkers[current].turns = 0;
+						arMarkers[current].shaking = 0;
+						// console.log("Marker " + current + " found.");
+					} else switch (arMarkers[current].state) {
+						case 4:
+							markerSetImage(current, arMarkers[current].pokemon.name);
+							arMarkers[current].turns = 0;
+						case 3:
+						case 5:
+							arMarkers[current].state = 2;
+							// console.log(arMarkers[current].pokemon.name + " is idle.");
+							break;
+					}
+					arMarkers[current].hidden = 0;
+
+					// if (!arMarkers[current])
+					// 	arMarkers[current] = {};
 					
 					// get transformation matrix
 					arDetector.getTransformMatrix(i, arMatResult);
 
-					// update marker info
-					arMarkers[current].age = 0;
-					if (arMarkers[current].idle === undefined)
-						arMarkers[current].idle = 0;
-					else
-						arMarkers[current].idle++;
+					// // update marker info
+					// arMarkers[current].age = 0;
+					// if (arMarkers[current].idle === undefined)
+					// 	arMarkers[current].idle = 0;
+					// else
+					// 	arMarkers[current].idle++;
 					arMarkers[current].transform = Object.asCopy(arMatResult);
-					if (arMarkers[current].pokemon)
-						arMarkers[current].pokemon.broke_free = false;
+					// if (arMarkers[current].pokemon)
+					// 	arMarkers[current].pokemon.broke_free = false;
 				}
 
 				// cleanup old markers
 				for (var i in arMarkers) {
-					var r = arMarkers[i];
-					var cancel;
-					if (r.age > arMarkerAgeLimit) {
-						cancel = false;
-						if (r.pokemon) {
-							var f = THREE.Math.random16();
-							if (r.pokemon.broke_free) {
-								if (f < r.pokemon.chance) {
-									console.log(r.pokemon.name + " fled.");
-									r.pokemon.showing = false;
-									scnAR.remove(r.model);
-									delete arMarkers[i];
-								}
-							} else if (f < r.pokemon.catch_rate) {
-								console.log("Congratulations. " + r.pokemon.name + " has been caught.");
-								r.pokemon.showing = false;
-								scnAR.remove(r.model);
+					var marker = arMarkers[i];
+
+					//	blue arrows
+					if (marker.hidden > 0) {
+						switch (marker.state) {
+							case 1:
 								delete arMarkers[i];
-							} else if (f > (1 - r.pokemon.catch_rate)) {
-								console.log(r.pokemon.name + " broke free. So close.");
-								r.pokemon.broke_free = true;
-								r.age = 0;
-							} else
-								console.log(r.pokemon.name + "'s pokeball is shaking.");
-						} else
-							delete arMarkers[i];
-					} else if (r.pokemon) {
-						// if (!r.pokemon.broke_free)
-							// r.age++;
-						if (r.idle > arMarkerAgeLimit && THREE.Math.random16() < r.pokemon.chance) {
-							console.log(r.pokemon.name + " fled.");
-							r.pokemon.showing = false;
-							scnAR.remove(r.model);
-							delete arMarkers[i];
+								// console.log("Marker " + i + " disappeared.");
+								break;
+							case 2:
+								marker.state = 3;
+								// console.log("Marker " + i + " is aging.");
+								break;
+							case 3:
+								if (marker.hidden > arMarkerAgeLimit) {
+									marker.state = 4;
+									marker.shaking = 0;
+									markerSetImage(i, "pokeball");
+								}
+								break;
+							case 4:
+								var f = THREE.Math.random16();
+								if (marker.shaking > limShaking && f < marker.pokemon.catch_rate) {
+									delete arMarkers[i];
+									scnAR.remove(marker.model);
+									console.log("Congratulations. " + marker.pokemon.name + " has been caught.");
+								} else if (marker.shaking > limShaking && f > (1 - marker.pokemon.catch_rate)) {
+									marker.state = 5;
+									markerSetImage(i, marker.pokemon.name);
+									marker.turns = 0;
+									console.log(marker.pokemon.name + " broke free.");
+								} else {
+									marker.shaking++;
+									console.log(marker.pokemon.name + "'s pokéball is shaking.");
+								}
+								break;
 						}
 					}
-						r.age++;
+					marker.hidden++;
+					marker.turns++;
+
+					// var r = arMarkers[i];
+					// var cancel;
+					// if (r.age > arMarkerAgeLimit) {
+					// 	cancel = false;
+					// 	if (r.pokemon) {
+					// 		var f = THREE.Math.random16();
+					// 		if (r.pokemon.broke_free) {
+					// 			if (f < r.pokemon.chance) {
+					// 				console.log(r.pokemon.name + " fled.");
+					// 				r.pokemon.showing = false;
+					// 				scnAR.remove(r.model);
+					// 				delete arMarkers[i];
+					// 			}
+					// 		} else if (f < r.pokemon.catch_rate) {
+					// 			console.log("Congratulations. " + r.pokemon.name + " has been caught.");
+					// 			r.pokemon.showing = false;
+					// 			scnAR.remove(r.model);
+					// 			delete arMarkers[i];
+					// 		} else if (f > (1 - r.pokemon.catch_rate)) {
+					// 			console.log(r.pokemon.name + " broke free. So close.");
+					// 			r.pokemon.broke_free = true;
+					// 			r.age = 0;
+					// 		} else
+					// 			console.log(r.pokemon.name + "'s pokeball is shaking.");
+					// 	} else
+					// 		delete arMarkers[i];
+					// } else if (r.pokemon) {
+					// 	// if (!r.pokemon.broke_free)
+					// 		// r.age++;
+					// 	if (r.idle > arMarkerAgeLimit && THREE.Math.random16() < r.pokemon.chance) {
+					// 		console.log(r.pokemon.name + " fled.");
+					// 		r.pokemon.showing = false;
+					// 		scnAR.remove(r.model);
+					// 		delete arMarkers[i];
+					// 	}
+					// }
+					// 	r.age++;
 				}
 
 				// draw models
 				for (var i in arMarkers) {
 					var marker = arMarkers[i];
 
-					if (!marker.model) {
-						var pokeNo = THREE.Math.randInt(1, pokeDB.length - 1);
-						var pokemon = pokeDB[pokeNo];
-						if (!pokemon.showing && THREE.Math.random16() < pokemon.chance) {
-							console.log("A wild " + pokemon.name + " appeared.");
-							pokemon.showing = true;
-							marker.pokemon = pokemon;
+					switch (marker.state) {
+						case 1:
+							var pokemon = pokeDB[THREE.Math.randInt(1, pokeDB.length - 1)];
+							if (THREE.Math.random16() < pokemon.chance) {
+								marker.state = 2;
+								marker.pokemon = pokemon;
 
-							var planeGeo = new THREE.PlaneGeometry(100, 100, 0);
-							var planeTex = new THREE.ImageUtils.loadTexture("images/" + pokemon.name.toLowerCase() + ".png");
-							var planeMat = new THREE.MeshLambertMaterial({map:planeTex});
-							var plane = new THREE.Mesh(planeGeo, planeMat);
-							plane.rotation.x += Math.PI / 2;
-							plane.doubleSided = true;
-							plane.overdraw = true;
+								marker.geometry = new THREE.PlaneGeometry(100, 100, 0);
+								var plnTex = new THREE.ImageUtils.loadTexture("images/" + pokemon.name.toLowerCase() + ".png");
+								var plnMat =  new THREE.MeshLambertMaterial({map:plnTex});
+								marker.plane = new THREE.Mesh(marker.geometry, plnMat);
+								marker.plane.rotation.x += Math.PI / 2;
+								marker.plane.doubleSided = true;
+								marker.plane.overdraw = true;
 
-							marker.model = new THREE.Object3D();
-							marker.model.matrixAutoUpdate = false;
-							// marker.model.add(cube);
-							marker.model.add(plane);
+								marker.model = new THREE.Object3D();
+								marker.model.matrixAutoUpdate = false;
+								marker.model.add(marker.plane);
 
-							scnAR.add(marker.model);
-						}
+								scnAR.add(marker.model);
+
+								console.log("A wild " + pokemon.name + " appeared.");
+							}
+							break;
+						case 2:
+						case 5:
+							if (marker.turns > THREE.Math.randInt(5,limFled) && THREE.Math.random16() < marker.pokemon.chance) {
+								marker.state = 1;
+								scnAR.remove(marker.model);
+								delete arMarkers[i];
+								console.log(marker.pokemon.name + " fled.");
+							}
 					}
+
 					if (marker.model) {
 						copyMatrix(marker.transform, arMatTemp);
 						marker.model.matrix.setFromArray(arMatTemp);
 						marker.model.matrixWorldNeedsUpdate = true;
 					}
+
+					// if (!marker.model) {
+					// 	var pokeNo = THREE.Math.randInt(1, pokeDB.length - 1);
+					// 	var pokemon = pokeDB[pokeNo];
+					// 	if (!pokemon.showing && THREE.Math.random16() < pokemon.chance) {
+					// 		console.log("A wild " + pokemon.name + " appeared.");
+					// 		pokemon.showing = true;
+					// 		marker.pokemon = pokemon;
+
+					// 		var planeGeo = new THREE.PlaneGeometry(100, 100, 0);
+					// 		var planeTex = new THREE.ImageUtils.loadTexture("images/" + pokemon.name.toLowerCase() + ".png");
+					// 		var planeMat = new THREE.MeshLambertMaterial({map:planeTex});
+					// 		var plane = new THREE.Mesh(planeGeo, planeMat);
+					// 		plane.rotation.x += Math.PI / 2;
+					// 		plane.doubleSided = true;
+					// 		plane.overdraw = true;
+
+					// 		marker.model = new THREE.Object3D();
+					// 		marker.model.matrixAutoUpdate = false;
+					// 		// marker.model.add(cube);
+					// 		marker.model.add(plane);
+
+					// 		scnAR.add(marker.model);
+					// 	}
+					// }
+					// if (marker.model) {
+					// 	copyMatrix(marker.transform, arMatTemp);
+					// 	marker.model.matrix.setFromArray(arMatTemp);
+					// 	marker.model.matrixWorldNeedsUpdate = true;
+					// }
 				}
 
 				renderer.autoClear = false;
@@ -263,7 +381,7 @@
 				arMarkers = {};
 
 				//	flip renderer canvas horizontally
-				renderer.domElement.style.cssText = "-webkit-transform: scale(-1,1);";
+				renderer.domElement.style.cssText = "-webkit-transform: scale(-1,-1);";
 
 				//	background music
 				var audio = document.createElement("audio");
