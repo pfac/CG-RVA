@@ -143,6 +143,7 @@
 							case 4:
 								var f = THREE.Math.random16();
 								if (marker.shaking > limShaking && f < marker.pokemon.catch_rate) {
+									pokeDex.rows[marker.pokeNo].cells[1].innerHTML = ++marker.pokemon.caught;
 									delete arMarkers[i];
 									scnAR.remove(marker.model);
 									console.log("Congratulations. " + marker.pokemon.name + " has been caught.");
@@ -206,9 +207,12 @@
 
 					switch (marker.state) {
 						case 1:
-							var pokemon = pokeDB[THREE.Math.randInt(1, pokeDB.length - 1)];
-							if (THREE.Math.random16() < pokemon.chance) {
+							var pokeNo = THREE.Math.randInt(1, pokeDB.length - 1);
+							var pokemon = pokeDB[pokeNo];
+							// if (THREE.Math.random16() < pokemon.chance) {
+							if (THREE.Math.random16() < pokemon.chance && (pokemon.locked == 0 || pokeDB[pokeNo - 1].caught >= pokemon.locked)) {
 								marker.state = 2;
+								marker.pokeNo = pokeNo;
 								marker.pokemon = pokemon;
 
 								marker.geometry = new THREE.PlaneGeometry(100, 100, 0);
