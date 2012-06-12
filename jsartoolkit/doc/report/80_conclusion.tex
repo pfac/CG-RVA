@@ -1,5 +1,14 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-\todo[inline]{Talk shit about all this except the pokemons}
-\todo[inline]{Please talk about how people like the author of JSARToolkit should die a horrible, slow and painfull death (or just leave this note in the final version)}
+In this document the implementation of a game based on the classic for portable devices Pokémon\textsuperscript{\textregistered} was described along with the JSARToolKit library which provided the abstraction necessary for Augmented Reality to be used as the interaction method.
+
+The implemented application used the WebRTC standard with an experimental release of Google Chrome to access the player webcam stream in real-time. The stream is then used in the JSARToolKit library to detect the markers and retrieve the information necessary to place the Pokémons on top of them.
+
+The game mechanics was implemented using a robust Finite State Machine model which predicts the changes in the marker visibility, the interaction of the player and the mechanisms required for the game logic (such as the Pokémon appearing, being caught or fleeing).
+
+Additional features, such as the Pokédex or an analogy to the evolution was added to improve the quality of the game.
+
+The JSARToolKit library proved to be the hardest challenge in this project, mainly due to the lack of documentation, both in and out of the source code. Aside from the source code itself, which due to the unfamiliarity with the Javascript language was not viable to analyze completely, only two resources online were found, both written by the author of the library. Yet, both those resources were filled with non functional, deprecated and very specific code. Understanding the library, as well as all the other elements required to make it work represented the most challenging part of the project. Shamefully, this lack of documentation seems to be a common practice in the Computer Graphics community.
+
+Although perfectly functional, and complete under the proposed goals for this project, much can be done to improve this game. Aside from the obvious design improvements, features like the different types of evolutions and floating text replacing the console would improve greatly the player experience. On a more general note, the concept of battle was ignored so far, but it may be possible to incorporate an analog feature in this game.

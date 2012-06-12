@@ -37,6 +37,7 @@ report.pdf:		report/32_pokedex.tex
 report.pdf:		report/images/marker.png
 report.pdf:		report/80_conclusion.tex
 report.pdf:		report/91_setup.tex
+report.bbl:		references.bib
 
 report/images/marker.png: report/dot/marker.dot
 	dot -Tpng -o $@ $<
