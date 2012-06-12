@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+
+		<title>Basic Detector</title>
+
+		<!--    LIBRARIES    -->
+		<script type="text/javascript" src="js/JSARToolKit.js"></script>
+		<script type="text/javascript" src="js/Three.js"></script>
+
+		<!--    MY JS FILES    -->
+		<script type="text/javascript" src="js/camera.js"></script>
+		<script type="text/javascript" src="js/pokemon.js"></script>
+
+		<!--    MY JS GLOBALS    -->
+		<script id="jsGlobals" type="text/javascript"><!--
+			// var frameGapInMillis = 16;
+			var frameGapInMillis = 80;
+
+			var renderer;
+
+			var video;//< element to show the webcam stream
+			var camVideo;//< WebGL camera to place the video as background
+			var cnvsVideo;//< canvas for the video stream
+			var scnVideo;//< 3D scene with the video as background
+			var texVideo;//< texture to hold the video images
+
+			var arDetector;
+			var arMarkers;//< markers cache array
+			var arMarkerAgeLimit = frameGapInMillis;
+			var arMatResult;
+			var arMatTemp;
+			var arRaster;
+			var arThreshold = 100;
+
+			var camAR;//< WebGL camera according to the webcam
+			var scnAR;//< 3D scene with the augmented reality
+
+			var limFled = arMarkerAgeLimit;
+			var limShaking = 10;
+// -->	</script>
+
+		<!--    MY JS FUNCTIONS    -->
+		<script id="jsMyFunctions" type="text/javascript"><!--
+			function markerSetImage (markerIndex, imgName) {
+				var marker = arMarkers[markerIndex];
+				
+				marker.model.remove(marker.plane);
+
+				var plnTex = new THREE.ImageUtils.loadTexture("images/" + imgName.toLowerCase() + ".png");
+				var plnMat =  new THREE.MeshLambertMaterial({map:plnTex});
+				marker.plane = new THREE.Mesh(marker.geometry, plnMat);
+				marker.plane.rotation.x += Math.PI / 2;
+				marker.plane.doubleSided = true;
+				marker.plane.overdraw = true;
+
+				marker.model.add(marker.plane);
+			}
+
+			function windowFrame () {
+				if (video.ended || video.paused || window.paused)
+					return;
+				
+				cnvsVideo.getContext("2d").drawImage(video, 0, 0, video.width, video.height);
+				cnvsVideo.changed = true;
+
+				texVideo.needsUpdate = true;
+
+				//	analyze the image and detect the markers
+				var detected = arDetector.detectMarkerLite(arRaster, arThreshold);
+
+				//	identify the markers
+				for (var i = 0; i < detected; ++i) {
+					var id = arDetector.getIdMarkerData(i);
+					var current;
+					if (id.packetLength > 4)
+						current = -1;
+					else {
+						current = 0;
+						for (var j = 0; j < id.packetLength; ++j)
+							current = (current << 8) | id.getPacketData(j);
+					}
+
+					//	green arrows
+					if (arMarkers[current] === undefined) {
+						arMarkers[current] = {};
+						arMarkers[current].state = 1;
+						arMarkers[current].turns = 0;
+						arMarkers[current].shaking = 0;
+						// console.log("Marker " + current + " found.");
+					} else switch (arMarkers[current].state) {
+						case 4:
+							markerSetImage(current, arMarkers[current].pokemon.name);
+							arMarkers[current].turns = 0;
+						case 3:
+						case 5:
+							arMarkers[current].state = 2;
+							// console.log(arMarkers[current].pokemon.name + " is idle.");
+							break;
+					}
+					arMarkers[current].hidden = 0;
+
+					// if (!arMarkers[current])
+					// 	arMarkers[current] = {};
+					
+					// get transformation matrix
+					arDetector.getTransformMatrix(i, arMatResult);
+
+					// // update marker info
+					// arMarkers[current].age = 0;
+					// if (arMarkers[current].idle === undefined)
+					// 	arMarkers[current].idle = 0;
+					// else
+					// 	arMarkers[current].idle++;
+					arMarkers[current].transform = Object.asCopy(arMatResult);
+					// if (arMarkers[current].pokemon)
+					// 	arMarkers[current].pokemon.broke_free = false;
+				}
+
+				// cleanup old markers
+				for (var i in arMarkers) {
+					var marker = arMarkers[i];
+
+					//	blue arrows
+					if (marker.hidden > 0) {
+						switch (marker.state) {
+							case 1:
+								delete arMarkers[i];
+								// console.log("Marker " + i + " disappeared.");
+								break;
+							case 2:
+								marker.state = 3;
+								// console.log("Marker " + i + " is aging.");
+								break;
+							case 3:
+								if (marker.hidden > arMarkerAgeLimit) {
+									marker.state = 4;
+									marker.shaking = 0;
+									markerSetImage(i, "pokeball");
+								}
+								break;
+							case 4:
+								var f = THREE.Math.random16();
+								if (marker.shaking > limShaking && f < marker.pokemon.catch_rate) {
+									delete arMarkers[i];
+									scnAR.remove(marker.model);
+									console.log("Congratulations. " + marker.pokemon.name + " has been caught.");
+								} else if (marker.shaking > limShaking && f > (1 - marker.pokemon.catch_rate)) {
+									marker.state = 5;
+									markerSetImage(i, marker.pokemon.name);
+									marker.turns = 0;
+									console.log(marker.pokemon.name + " broke free.");
+								} else {
+									marker.shaking++;
+									console.log(marker.pokemon.name + "'s pokéball is shaking.");
+								}
+								break;
+						}
+					}
+					marker.hidden++;
+					marker.turns++;
+
+					// var r = arMarkers[i];
+					// var cancel;
+					// if (r.age > arMarkerAgeLimit) {
+					// 	cancel = false;
+					// 	if (r.pokemon) {
+					// 		var f = THREE.Math.random16();
+					// 		if (r.pokemon.broke_free) {
+					// 			if (f < r.pokemon.chance) {
+					// 				console.log(r.pokemon.name + " fled.");
+					// 				r.pokemon.showing = false;
+					// 				scnAR.remove(r.model);
+					// 				delete arMarkers[i];
+					// 			}
+					// 		} else if (f < r.pokemon.catch_rate) {
+					// 			console.log("Congratulations. " + r.pokemon.name + " has been caught.");
+					// 			r.pokemon.showing = false;
+					// 			scnAR.remove(r.model);
+					// 			delete arMarkers[i];
+					// 		} else if (f > (1 - r.pokemon.catch_rate)) {
+					// 			console.log(r.pokemon.name + " broke free. So close.");
+					// 			r.pokemon.broke_free = true;
+					// 			r.age = 0;
+					// 		} else
+					// 			console.log(r.pokemon.name + "'s pokeball is shaking.");
+					// 	} else
+					// 		delete arMarkers[i];
+					// } else if (r.pokemon) {
+					// 	// if (!r.pokemon.broke_free)
+					// 		// r.age++;
+					// 	if (r.idle > arMarkerAgeLimit && THREE.Math.random16() < r.pokemon.chance) {
+					// 		console.log(r.pokemon.name + " fled.");
+					// 		r.pokemon.showing = false;
+					// 		scnAR.remove(r.model);
+					// 		delete arMarkers[i];
+					// 	}
+					// }
+					// 	r.age++;
+				}
+
+				// draw models
+				for (var i in arMarkers) {
+					var marker = arMarkers[i];
+
+					switch (marker.state) {
+						case 1:
+							var pokemon = pokeDB[THREE.Math.randInt(1, pokeDB.length - 1)];
+							if (THREE.Math.random16() < pokemon.chance) {
+								marker.state = 2;
+								marker.pokemon = pokemon;
+
+								marker.geometry = new THREE.PlaneGeometry(100, 100, 0);
+								var plnTex = new THREE.ImageUtils.loadTexture("images/" + pokemon.name.toLowerCase() + ".png");
+								var plnMat =  new THREE.MeshLambertMaterial({map:plnTex});
+								marker.plane = new THREE.Mesh(marker.geometry, plnMat);
+								marker.plane.rotation.x += Math.PI / 2;
+								marker.plane.doubleSided = true;
+								marker.plane.overdraw = true;
+
+								marker.model = new THREE.Object3D();
+								marker.model.matrixAutoUpdate = false;
+								marker.model.add(marker.plane);
+
+								scnAR.add(marker.model);
+
+								console.log("A wild " + pokemon.name + " appeared.");
+							}
+							break;
+						case 2:
+						case 5:
+							if (marker.turns > THREE.Math.randInt(5,limFled) && THREE.Math.random16() < marker.pokemon.chance) {
+								marker.state = 1;
+								scnAR.remove(marker.model);
+								delete arMarkers[i];
+								console.log(marker.pokemon.name + " fled.");
+							}
+					}
+
+					if (marker.model) {
+						copyMatrix(marker.transform, arMatTemp);
+						marker.model.matrix.setFromArray(arMatTemp);
+						marker.model.matrixWorldNeedsUpdate = true;
+					}
+
+					// if (!marker.model) {
+					// 	var pokeNo = THREE.Math.randInt(1, pokeDB.length - 1);
+					// 	var pokemon = pokeDB[pokeNo];
+					// 	if (!pokemon.showing && THREE.Math.random16() < pokemon.chance) {
+					// 		console.log("A wild " + pokemon.name + " appeared.");
+					// 		pokemon.showing = true;
+					// 		marker.pokemon = pokemon;
+
+					// 		var planeGeo = new THREE.PlaneGeometry(100, 100, 0);
+					// 		var planeTex = new THREE.ImageUtils.loadTexture("images/" + pokemon.name.toLowerCase() + ".png");
+					// 		var planeMat = new THREE.MeshLambertMaterial({map:planeTex});
+					// 		var plane = new THREE.Mesh(planeGeo, planeMat);
+					// 		plane.rotation.x += Math.PI / 2;
+					// 		plane.doubleSided = true;
+					// 		plane.overdraw = true;
+
+					// 		marker.model = new THREE.Object3D();
+					// 		marker.model.matrixAutoUpdate = false;
+					// 		// marker.model.add(cube);
+					// 		marker.model.add(plane);
+
+					// 		scnAR.add(marker.model);
+					// 	}
+					// }
+					// if (marker.model) {
+					// 	copyMatrix(marker.transform, arMatTemp);
+					// 	marker.model.matrix.setFromArray(arMatTemp);
+					// 	marker.model.matrixWorldNeedsUpdate = true;
+					// }
+				}
+
+				renderer.autoClear = false;
+				renderer.clear();
+				renderer.render(scnVideo, camVideo);
+				renderer.clear(0x0, 0xffffffff, 0x0);
+				renderer.render(scnAR, camAR);
+			}
+
+
+
+
+
+
+			/************************************
+			 *	Window Events
+			 */
+			window.onload = function () {
+				pokeInit();
+
+				//	webcam video
+				video = document.createElement("video");
+				video.width = 640;
+				video.height = 480;
+				video.autoplay = true;
+					getUserMedia(video);
+
+				//	canvas for the video
+				cnvsVideo = document.createElement("canvas");
+				cnvsVideo.id = "cnvsVideo";
+				cnvsVideo.width = video.width;
+				cnvsVideo.height = video.height;
+
+				//	array to temporary hold the matrix data
+				arMatTemp = new Float32Array(16);
+
+				//	matrix to hold the resulting matrices
+				arMatResult = new NyARTransMatResult();
+
+				//	bitmap wrapper for analysis
+				arRaster = new NyARRgbRaster_Canvas2D(cnvsVideo);
+
+				//	parameter wrapper for the detector
+				var arParam = new FLARParam(video.width, video.height);
+				arParam.copyCameraMatrix(arMatTemp, 1, 2000);
+
+				//	detector to identify the markers
+				arDetector = new FLARMultiIdMarkerDetector(arParam, arThreshold);
+				arDetector.setContinueMode(true);
+
+				/***************************************
+				 * 3D rendering
+				 */
+				renderer = new THREE.WebGLRenderer();
+				renderer.setSize(video.width, video.height);
+				renderer.setClearColorHex(0x777777, 1.0);
+
+				//	Video scene
+					//	texture with the video image
+					texVideo = new THREE.Texture(cnvsVideo);
+
+					//	billboard - geometry
+					var bbGeo = new THREE.PlaneGeometry(2, 2, 0);
+
+					//	billboard - material
+					var bbMat = new THREE.MeshBasicMaterial({map:texVideo});
+
+					//	billboard plane
+					var bbPlane = new THREE.Mesh(bbGeo, bbMat);
+					bbPlane.rotation.x += Math.PI / 2;
+					bbPlane.depthTest = false;
+					bbPlane.depthWrite = false;
+
+					//	camera (default)
+					camVideo = new THREE.Camera();
+
+					//	the scene object
+					scnVideo = new THREE.Scene();
+					scnVideo.add(bbPlane);
+					scnVideo.add(camVideo);
+
+				//	Augmented reality scene
+					//	light point 1
+					// var lightPoint1 = new THREE.PointLight(0xffffff, 2.0);
+					// lightPoint1.position.set(400, 500, 100);
+
+					//	light point 2
+					// var lightPoint2 = new THREE.PointLight(0xffffff);
+					// lightPoint2.position.set(-400, 500, -100);
+
+					//	ambient light
+					var ambLight = new THREE.AmbientLight(0xffffff, 1.0);
+
+					//	camera (set by the JSARToolKit lib)
+					camAR = new THREE.Camera();
+					camAR.projectionMatrix.setFromArray(arMatTemp);
+
+					//	the scene object
+					scnAR = new THREE.Scene();
+					// scnAR.add(lightPoint1);
+					// scnAR.add(lightPoint2);
+					scnAR.add(ambLight);
+					scnAR.add(camAR);
+				
+				//	initialize the markers array
+				arMarkers = {};
+
+				//	flip renderer canvas horizontally
+				renderer.domElement.style.cssText = "-webkit-transform: scale(-1,-1);";
+
+				//	background music
+				var audio = document.createElement("audio");
+				audio.loop = true;
+				audio.autoplay = true;
+				audio.src = "audio/pikachu.ogg";
+
+				//	add visual elements
+				// document.body.appendChild(video);
+				// document.body.appendChild(cnvsVideo);
+				document.body.appendChild(renderer.domElement);
+				document.body.appendChild(audio);
+
+				window.setInterval(windowFrame, frameGapInMillis);
+			}
+// -->	</script>
+
+		<!--    OTHER PEOPLE JS FUNCTIONS -->
+		<script id="jsFunctions" type="text/javascript"><!--
+			THREE.Matrix4.prototype.setFromArray = function(m) {
+				return this.set(
+					m[0], m[4], m[8], m[12],
+					m[1], m[5], m[9], m[13],
+					m[2], m[6], m[10], m[14],
+					m[3], m[7], m[11], m[15]
+				);
+			};
+
+			function copyMatrix(mat, cm) {
+				cm[0] = mat.m00;
+				cm[1] = -mat.m10;
+				cm[2] = mat.m20;
+				cm[3] = 0;
+				cm[4] = mat.m01;
+				cm[5] = -mat.m11;
+				cm[6] = mat.m21;
+				cm[7] = 0;
+				cm[8] = -mat.m02;
+				cm[9] = mat.m12;
+				cm[10] = -mat.m22;
+				cm[11] = 0;
+				cm[12] = mat.m03;
+				cm[13] = -mat.m13;
+				cm[14] = mat.m23;
+				cm[15] = 1;
+			}
+// -->	</script>
+	</head>
+
+	<body>
+	</body>
+</html>

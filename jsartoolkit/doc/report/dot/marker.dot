@@ -1,0 +1,24 @@
+digraph g{
+  node [shape=ellipse, style="solid, filled", color=black, fillcolor=blue, fontcolor=white, penwidth=2]
+  a [label="0 - Lost"];
+  b [label="1 - Marker", fillcolor=green3, fontcolor=black];
+  c [label="2 - Idle", fillcolor=green3, fontcolor=black];
+  d [label="3 - Aging"];
+  e [label="4 - Shaking"];
+  f [label="5 - Free"];
+
+  edge [penwidth=2, arrowsize=1.5, fontsize=10];
+  a -> b [color=green3];
+  b -> a [color=blue];
+  b -> c [label="APPEAR"];
+  c -> b [label="    FLED", color=red3, fontcolor=red3];
+  c -> d [color=blue];
+  d -> c [color=green3];
+  d -> e [label="    AGED"];
+  d -> d [label="    age++"];
+  e -> a [label="  CAUGHT"];
+  e -> c [color=green3, label="(FREE)", fontcolor=green4];
+  e -> f [label="    FREE"];
+  f -> a [label="   FLED"];
+  f -> c [color=green3];
+}
