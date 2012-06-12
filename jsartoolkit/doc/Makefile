@@ -30,6 +30,7 @@ report:	report.pdf
 report.pdf:		report/00_abstract.tex
 report.pdf:		report/10_intro.tex
 report.pdf:		report/20_jsartoolkit.tex
+report.pdf:		report/images/basic.png
 report.pdf:		report/30_game.tex
 report.pdf:		report/31_evolution.tex
 report.pdf:		report/32_pokedex.tex
