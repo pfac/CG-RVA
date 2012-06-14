@@ -1,8 +1,8 @@
 \documentclass[10pt,a4paper,twocolumn]{article}
 
-\usepackage{epcg_pt}
+\usepackage{epcg_en}
 %\usepackage{epcg_pt}
-\usepackage{ucs}
+%\usepackage{ucs}
 \usepackage[utf8x]{inputenc}
 \usepackage[T1]{fontenc}
 %\usepackage[english]{babel}
@@ -23,39 +23,29 @@
 \usepackage{cleveref}
 %\usepackage[noabbrev]{cleveref}
 \usepackage{listings}
+\usepackage{biblatex}
 \usepackage{color}
 \usepackage{todonotes}
+
+\bibliography{references.bib}
 
 %%%%%%%%%%%%%%%%
 %  title page  %
 %%%%%%%%%%%%%%%%
-%\titlehead{University of Minho \hfill Master's Degree in Informatics Engineering\\	Department of Informatics \hfill Computer Graphics}
-%
-%\title{JSARToolKit}
-%
-%\subtitle{Augmented Reality applied to a Pokémon\textsuperscript{\textregistered}\ Game}
-%
-%\author{Ana Catarina Macedo\\\texttt{\smaller a54773@alunos.uminho.pt}
-%\and Miguel Palhas\\\texttt{\smaller pg19808@alunos.uminho.pt}
-%\and Pedro Costa\\\texttt{\smaller pg19830@alunos.uminho.pt}}
-%
-%\date{Braga, June 2012}
-%
-%\subject{Virtual and Augmented Reality}
 
 \title{Web Browser Based Implementation of an Augmented Reality Game}
 
-\author{Ana Catarina Macedo \\
-Universidade do Minho \\
-\texttt{\small a54773@alunos.uminho.pt}
+\author{Autor 1 \\%Ana Catarina Macedo \\
+%Universidade do Minho \\
+%\texttt{\small a54773@alunos.uminho.pt}
 \and
-Miguel Palhas \\
-Universidade do Minho \\
-\texttt{\small pg19808@alunos.uminho.pt}
+Autor 2 %Miguel Palhas \\
+%Universidade do Minho \\
+%\texttt{\small pg19808@alunos.uminho.pt}
 \and
-Pedro Costa \\
-Universidade do Minho \\
-\texttt{\small pg19830@alunos.uminho.pt}
+Autor 3%Pedro Costa \\
+%Universidade do Minho \\
+%\texttt{\small pg19830@alunos.uminho.pt}
 }
 
 \date{Braga, June 2012}
@@ -82,22 +72,19 @@ Universidade do Minho \\
 
 \input{report/00_abstract}
 
-\keywords{Augmented Reality, JSARToolkit, WebGL, Game}
+\keywords{Augmented Reality, JSARToolkit, WebGL, Game Development, Web Based}
 
 \begin{document}
 \maketitle
-%\thispagestyle{empty}
 
 \input{report/10_intro}
 \input{report/20_jsartoolkit}
 \input{report/30_game}
 \input{report/80_conclusion}
 
-\nocite{jsartoolkit}
-\nocite{heikkinen2012}
-\nocite{bulbapedia}
-\bibliographystyle{is-plain}
-\bibliography{references}
+\nocite{*}
+
+\printbibliography
 
 \appendix
 

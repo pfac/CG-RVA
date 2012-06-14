@@ -17,7 +17,7 @@ The implemented game follows the same premiss but uses a mechanic different than
 	\label{fig:fnm}
 \end{figure}
 
-Each marker is represented in the game as a Finite State Machine, described in \cref{fig:fnm}. The implemented states are as follows:
+Each marker is represented in the game as a Finite State Machine, described in \Cref{fig:fnm}. The implemented states are as follows:
 \begin{description}
 	\item[Lost (hidden)]{Every marker starts in this state and changes only when revealed.}
 	\item[Marker (revealed)]{Empty marker. If hidden, the state changes back to Lost. In each frame, a Pokémon is selected and $\xi\in\left[0,1\right]$ is generated. If $\xi$ is less than the probability for that Pokémon to appear, the Pokémon is assigned to the marker and the state changes to Idle. Otherwise it remains in the same state.}
@@ -31,7 +31,7 @@ Each marker is represented in the game as a Finite State Machine, described in \
 	\begin{center}
 		\includegraphics[width=\columnwidth]{report/images/catchy.png}
 	\end{center}
-	\caption[Game]{The game currently running. The canvas can be seen which includes the camera video feed, as well as some Pokémons appearing on randomly chosen markers. The bottom right marker is currently being obstructed by the user's hand, so a pokéball is shown instead, meaning the player is currently capturing that pokémon.}
+	\caption[Game]{The canvas can be seen which includes the camera video feed, as well as some Pokémons appearing on randomly chosen markers. The bottom right marker is currently being obstructed by the user's hand, so a pokéball is shown instead, meaning the player is currently capturing that pokémon.}
 	\label{fig:catchy}
 \end{figure}
 
