@@ -47,8 +47,9 @@ function pokeInit () {
 	var thead = pokeDex.createTHead();
 	var row = thead.insertRow(-1);
 	row.insertCell(-1).innerHTML = "Pokémon";
-	row.insertCell(-1).innerHTML = "Caught";
+	row.insertCell(-1).innerHTML = "Lvl";
 
+	document.getElementById('initial_image')
 	document.getElementById('pokedex_container').appendChild(pokeDex);
 }
 

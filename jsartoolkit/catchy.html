@@ -14,8 +14,7 @@
 				background-color: #F7DE84;
 				background-position: bottom right;
 				background-repeat: no-repeat;
-				font-family: 'Courier';
-				font-weight: bold;
+				font-family: 'Arial';
 				height: 100%;
 			}
 
@@ -43,10 +42,19 @@
 
 			#pokedex_container thead td {
 				border-bottom: solid 1px;
+				font-weight: bold;
 			}
 
-			#pokedex_container tr td:last-child {
+			#pokedex_container tr td {
 				text-align: right;
+			}
+
+			#bob_container {
+				z-index: 1;
+			}
+
+			#cnvs_container {
+				z-index: 2;
 			}
 		</style>
 
@@ -104,6 +112,11 @@
 			}
 
 			function windowFrame () {
+				//if (renderer.domElement.style.display == 'none') {
+					document.getElementById('cnvsVideo').style.display = 'block'
+					document.getElementById('bob').style.display = 'none'
+				//}
+
 				if (video.ended || video.paused || window.paused)
 					return;
 				
@@ -351,15 +364,16 @@
 
 				//	canvas for the video
 				cnvsVideo = document.createElement("canvas");
-				cnvsVideo.id = "cnvsVideo";
+				//cnvsVideo.id = "cnvsVideo";
 				cnvsVideo.width = video.width;
 				cnvsVideo.height = video.height;
 
 				img = new Image()
 				img.src = 'images/_gyarados-bob.jpg'
+				img.id = 'bob'
 				img.width = 640
 				img.height = 480
-				//document.getElementById('video_container').appendChild(img)
+				document.getElementById('video_container').appendChild(img)
 
 				//	array to temporary hold the matrix data
 				arMatTemp = new Float32Array(16);
@@ -447,10 +461,10 @@
 				//	add visual elements
 				// document.body.appendChild(video);
 				// document.body.appendChild(cnvsVideo);
+				renderer.domElement.id = 'cnvsVideo'
+				renderer.domElement.style.display = 'none'
 
 				document.getElementById('video_container').appendChild(renderer.domElement);
-
-				//cnvsVideo.style.display = 'none'
 				document.body.appendChild(audio);
 
 				window.setInterval(windowFrame, frameGapInMillis);
@@ -494,7 +508,8 @@
 			<div id="header"></div>
 
 			<div id="content">
-				<div id="video_container"></div>
+				<div id="video_container">
+				</div>
 				<div id="pokedex_container"></div>
 			</div>
 		</div>
