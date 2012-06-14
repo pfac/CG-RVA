@@ -37,7 +37,21 @@
 
 \frame[plain]{\titlepage}
 
-\frame{\frametitle{Index}\tableofcontents}
+\begin{frame}
+	\frametitle{Index}
+	\begin{columns}
+		\begin{column}{0.4\linewidth}
+			\tableofcontents
+		\end{column}
+		\begin{column}{0.5\linewidth}
+			\begin{figure}
+				\begin{center}
+					\includegraphics[width=\textwidth]{slides/images/charizard.png}
+				\end{center}
+			\end{figure}
+		\end{column}
+	\end{columns}
+\end{frame}
 
 
 
@@ -62,7 +76,7 @@
 		\begin{center}
 			\includegraphics[width=0.4\textwidth]{slides/images/missingno.jpeg}
 			\;
-			\includegraphics[width=0.4\textwidth]{slides/images/mew.png}
+			\includegraphics[width=0.4\textwidth]{slides/images/mewbug.png}
 		\end{center}
 	\end{figure}
 \end{frame}
@@ -91,21 +105,22 @@
 
 
 \section{The Game}
-\begin{figure}
+\begin{frame}
 	\frametitle{The Game}
 	\begin{columns}
-		\begin{column}{0.5\linewidth}
+		\begin{column}{0.4\linewidth}
 			\tableofcontents[currentsection,subsectionstyle=show/show/hide]
 		\end{column}
 		\begin{column}{0.5\linewidth}
+			\vfill
 			\begin{figure}
 				\begin{center}
-					\includegraphics[width=\linewidth]{slides/images/pikachu.jpeg}
+					\includegraphics[width=\textwidth]{slides/images/pikachu.jpeg}
 				\end{center}
 			\end{figure}
 		\end{column}
 	\end{columns}
-\end{figure}
+\end{frame}
 
 \subsection{Augmented Reality}
 \begin{frame}
@@ -129,30 +144,106 @@
 
 \subsection{Mechanics}
 \begin{frame}
-	\frametitle{}
+	\frametitle{Gameplay}
 	\begin{columns}
 		\begin{column}{0.5\linewidth}
+			\begin{description}
+				\item[Lost]{Not found;}
+				\item[Marker]{Found a marker;}
+				\item[Idle]{Pokémon in the marker;}
+				\item[Aging]{The marker disappeared;}
+				\item[Shaking]{A PokéBall was thrown;}
+				\item[Free]{The Pokémon broke free;}
+			\end{description}
 		\end{column}
 		\begin{column}{0.5\linewidth}
+			\begin{figure}
+				\begin{center}
+					\includegraphics[width=0.9\textwidth]{slides/images/marker.png}
+				\end{center}
+			\end{figure}
 		\end{column}
 	\end{columns}
 \end{frame}
 
 \subsection{Features}
+\begin{frame}
+	\frametitle{Features}
+	\begin{description}
+		\item[Rotativity]{The Pokémons flee after some time;}
+		\vfill
+		\item[Leveling]{Each time a Pokémon is caught $\Rightarrow$ Level up!}
+		\vfill
+		\item[PokéDex]{Visual Pokémon count updated in real-time;}
+		\vfill
+		\item[Evolution]{Evolutions are only available when the previous form achieves the required level;}
+	\end{description}
+\end{frame}
+
+\begin{frame}[plain]
+	\begin{figure}
+		\begin{center}
+			\includegraphics[width=\textwidth]{slides/images/catchy.png}
+		\end{center}
+	\end{figure}
+\end{frame}
 
 \section{Conclusion}
-\subsection{Problems}
+\begin{frame}[shrink]
+	\frametitle{Conclusion}
+	\begin{itemize}
+		\item{Fully functional game;}
+		\item{Pure awesomeness;}
+	\end{itemize}
+	
+	\begin{block}{Problems}
+		\begin{itemize}
+			\item{Almost complete absence of documentation;}
+			\item{Tutorials use deprecated code;}
+		\end{itemize}
+	\end{block}
+	
+	\begin{block}{Future work}
+		\begin{itemize}
+			\item{Floating messages;}
+			\item{3D Pokémon models;}
+			\item{Different types of evolutions;}
+			\item{Concept of battle;}
+			\item{Improved webpage design;}
+			\item{$\ldots$}
+		\end{itemize}
+	\end{block}
+\end{frame}
+		
 
 
 
 
 \section{Questions}
-\begin{frame}
+\begin{frame}[plain]
 	\titlepage
-	\begin{center}
-		\Huge\bfseries
-		- ? -
-	\end{center}
+	\begin{columns}
+		\begin{column}{0.3\linewidth}
+			\begin{figure}
+				\begin{center}
+					\includegraphics[width=\textwidth]{slides/images/mew.png}
+				\end{center}
+			\end{figure}
+		\end{column}
+		\begin{column}{0.4\linewidth}
+			\begin{center}
+			\Huge\bfseries
+				- ? -
+			\end{center}
+		\end{column}
+		\begin{column}{0.3\linewidth}
+			\begin{figure}
+				\begin{center}
+					\includegraphics[width=\textwidth]{slides/images/mewtwo.png}
+				\end{center}
+			\end{figure}
+		\end{column}
+	\end{columns}
 \end{frame}
 
 \end{document}%	end presentation
