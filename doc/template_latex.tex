@@ -1,0 +1,156 @@
+\documentclass[10pt,a4paper,twocolumn]{article}
+
+%\usepackage{epcg_en}
+% Versao em Portuguêes 
+\usepackage{epcg_pt}
+
+\usepackage{times}
+\usepackage{epsfig}
+\usepackage[latin1]{inputenc}
+\pagestyle{empty}
+
+\title{Portuguese Annual Computer Graphics Meetings \\
+Submission Format}
+
+\author{Nome1 Apelido1 \\
+Dep. XYZ, InstituiÁ„o \\
+Av. Qualquer, 1000 Lisboa \\
+\small{\texttt{email@dominio.pt}}\\
+\and
+Nome2 A. Apelido2 \\
+Univ. XYZ \\
+Cidade  \\
+\small{\texttt{email2@dominio.pt}}\\ 
+\and
+Nome3 Apelido3 \\
+InstituiÁ„o X / InstituiÁ„o Y \\
+Cidade  \\
+\small{\texttt{email3@dominio.pt}}\\
+\and
+Nome4 Apelido4 ~~~~~ Nome5 Apelido5 \\
+Uma Mesma InstituiÁ„o \\
+Rua Qualquer, 4000 Porto \\
+\small{\texttt{\{email4,email5\}@dominio.pt}}}
+
+\date{}
+
+\abstract{Em artigos escritos noutra lÌngua que n„o a portuguesa, deve ser incluÌdo um resumo em portuguÍs / A portuguese abstract should be present in non-portuguese submissions.
+}
+
+% if no additional abstract is needed, comment or remove the following lines
+\additionalabstracttitle{Abstract}
+\additionalabstract{
+This document describes the format of submissions to Portuguese Annual Computer Graphics Meetings.
+The abstract should be written using 10-point Times New Roman (hereinafter
+designated as Times) or equivalent (e.g. Computer Modern) with justified right
+margin and both margins indented by 0,5cm with respect to body text. The
+Abstract should be delimited by two horizontal lines 1 1/2 point wide, set 12
+points off text. The abstract should be separated from text above and below by
+24 points (at least).
+}
+
+
+\keywords{A list of up to seven keywords, separated by commas. 10-point Times
+New Roman justified.}
+
+\begin{document}
+\maketitle
+\thispagestyle{empty}
+
+\Section{INTRODUCTION}
+This document describes a format for contributions sub-mitted to the Portuguese Annual Computer Graphics Meetings (EPCG). 
+
+Contributions should be submitted in electronic format (preferably PDF). Other formats cannot be accepted unless previously agreed with the editors.
+
+
+\Section{MULTIMEDIA ATTACHMENTS}
+We encourage authors to submit multimedia attachments using the more common
+formats (JPEG, MPEG, VRML, etc.) to complement and enrich the textual
+submissions. For appendices larger than 10Mb, you should ask for the editor's
+agreement beforehand.
+
+\Section{BODY TEXT and MARGINS}
+Documents should be formatted to A4 page size, with a  1,9 cm left and right
+margins. Top and bottom margins should be 2,5 cm. Header and footnotes should be
+set off 1,25 cm from margins. \textbf{Do not number} pages. Contributions to
+EPCG should \textbf{not} use headers or footers.
+
+Body text should be formatted as two columns 8,18 cm wide, spaced 0,84 cm apart.
+In the last page, both columns should have the same height, as show here.
+
+\Section{TEXT FORMATTING GUIDELINES}
+Text format should follow the guidelines set forth in the following sections wrt
+organisation, layout and style.  Table 1, shown in appendix summarises the
+styles used in this document.
+
+\SubSection{Normal Text}
+Normal text should be justified on both margins using 10-point \textit{Times}
+font or equivalent and single-space lines.
+
+Space between paragraphs should be 4 points.
+
+A numbered list is made of normal text, where a number sets off each line:
+
+\begin{enumerate} \item Items in numbered lists should be indented by 0,63 cm.
+\end{enumerate}
+
+Bulleted lists also use normal text, where each line is preceded by a special
+symbol:
+\begin{itemize}
+\item Text in a bulleted list is also indented by 0,63 cm.
+\end{itemize}
+
+Only in special cases should be used a different font, such as when presenting
+program source code, for which a san-serif fixed-width font such as 10-point
+\texttt{Courier} or \texttt{Courier New} or equivalent is recommended.
+
+\SubSection{Title and Author Information}
+After the paper Title (Times 18 point bold), there should appear author names
+(Times 12 point font), affiliations (10pt Helvetica) and e-mail addresses is any
+(Courier 10 pt) formatted to a maximum of three equi-spaced columns of the same
+width, at the top of the document's first page. If there are more than three
+co-authors, the layout should use multiple lines as shown in this example.
+Common affiliations should be centred across the page as illustrated by the last
+two authors in this example text.
+
+\SubSection{Citations and References}
+Footnotes\footnote{Footnotes should appear below the column containing the
+reference.} should be set using 9-point Times left and right justified.
+
+All bibliographic references should use the same style and appear alphabetically
+ordered by first author's surname (example \cite{mantyla88, meagher82}). References should use the \texttt{long\_en} format. 
+
+\Section{SECTIONS}
+Section headings should be set in Helvetica 10-point bold font in ALL CAPS, left
+justified. Sections at the end of a column with less 4 lines of text, should
+start in the next column.
+
+\SubSection{Subsection Headings}
+Subsection headings should be set in Helvetica 10 point bold with all words
+Capitalised (Note: particles such as  "a" and "the" should not be capitalised
+unless they are the first word.)
+\SubSubSection{Subsubsection headings}
+Use Helvetica italic 10-point font. Only the first word should be capitalised.
+
+\Section{FIGURES, TABLES, IMAGES and CAPTIONS}
+Figures, tables and images should be placed as close as possible to the text
+that references them. These elements should not appear without being referred to
+in the body text or without a caption. Whenever possible, these should be as
+wide as a single column or appear centred within a column if narrower.
+\textit{If necessary}, these elements can take the full two-column width,
+\textit{without exceeding the document margins}.
+
+Captions should use Times 9 point boldface, and should be numbered (e.g: "Table
+1", "Figure 1") and centred immediately below their corresponding image, table
+or figure.
+
+\Section{ACKNOWLEDGEMENTS}
+If there are acknowledgements, these should appear in the last section,
+immediately before the references.
+
+
+\bibliography{bibliog}
+%\bibliographystyle{long_pt}
+\bibliographystyle{long_en}
+
+\end{document}

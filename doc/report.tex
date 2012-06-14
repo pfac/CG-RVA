@@ -1,0 +1,107 @@
+\documentclass[10pt,a4paper,twocolumn]{article}
+
+\usepackage{epcg_pt}
+%\usepackage{epcg_pt}
+\usepackage{ucs}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+%\usepackage[english]{babel}
+
+%\usepackage{graphics}%	images other than eps
+
+%\usepackage[paper=a4paper,top=2cm,left=1.5cm,right=1.5cm,bottom=2cm,foot=1cm]{geometry}
+
+%\usepackage{relsize}%	relative font sizes
+
+%\usepackage[retainorgcmds]{IEEEtrantools}%	IEEEeqnarray
+%\setlength{\IEEEnormaljot}{4\IEEEnormaljot}
+
+\usepackage{graphicx}
+\usepackage{epstopdf}
+\usepackage{indentfirst}
+\usepackage{hyperref}
+\usepackage{cleveref}
+%\usepackage[noabbrev]{cleveref}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{todonotes}
+
+%%%%%%%%%%%%%%%%
+%  title page  %
+%%%%%%%%%%%%%%%%
+%\titlehead{University of Minho \hfill Master's Degree in Informatics Engineering\\	Department of Informatics \hfill Computer Graphics}
+%
+%\title{JSARToolKit}
+%
+%\subtitle{Augmented Reality applied to a Pokémon\textsuperscript{\textregistered}\ Game}
+%
+%\author{Ana Catarina Macedo\\\texttt{\smaller a54773@alunos.uminho.pt}
+%\and Miguel Palhas\\\texttt{\smaller pg19808@alunos.uminho.pt}
+%\and Pedro Costa\\\texttt{\smaller pg19830@alunos.uminho.pt}}
+%
+%\date{Braga, June 2012}
+%
+%\subject{Virtual and Augmented Reality}
+
+\title{Web Browser Based Implementation of an Augmented Reality Game}
+
+\author{Ana Catarina Macedo \\
+Universidade do Minho \\
+\texttt{\small a54773@alunos.uminho.pt}
+\and
+Miguel Palhas \\
+Universidade do Minho \\
+\texttt{\small pg19808@alunos.uminho.pt}
+\and
+Pedro Costa \\
+Universidade do Minho \\
+\texttt{\small pg19830@alunos.uminho.pt}
+}
+
+\date{Braga, June 2012}
+
+
+%%%%%%%%%%%
+%  Hacks  %
+%%%%%%%%%%%
+
+%	Paragraph (title) with linebreak
+\newcommand{\paragraphh}[1]{\paragraph{#1\hfill}\hfill
+
+}
+
+%	Add "Appendix" to the appendices titles, but not to the references
+\usepackage{ifthen}
+\newcommand*{\appendixmore}{%
+  \renewcommand*{\othersectionlevelsformat}[1]{%
+    \ifthenelse{\equal{##1}{section}}{\appendixname~}{}%
+    \csname the##1\endcsname\autodot\enskip}
+  \renewcommand*{\sectionmarkformat}{%
+    \appendixname~\thesection\autodot\enskip}
+}
+
+\input{report/00_abstract}
+
+\keywords{Augmented Reality, JSARToolkit, WebGL, Game}
+
+\begin{document}
+\maketitle
+%\thispagestyle{empty}
+
+\input{report/10_intro}
+\input{report/20_jsartoolkit}
+\input{report/30_game}
+\input{report/80_conclusion}
+
+\nocite{jsartoolkit}
+\nocite{heikkinen2012}
+\nocite{bulbapedia}
+\bibliographystyle{is-plain}
+\bibliography{references}
+
+\appendix
+
+\input{report/91_setup}
+%\input{report/92_source}
+
+\end{document}

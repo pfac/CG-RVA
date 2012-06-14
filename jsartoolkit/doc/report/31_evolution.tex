@@ -1,6 +1,0 @@
-\subsection{Evolution}
-\label{sec:evolution}
-
-In order to simulate the process of evolution, the concept of level is simplified to that of how many times a form as been caught. The subsequent forms are then locked with the required number of times the previous form needs to be caught in order to unlock it. The act of unlocking is automatic: when a Pokémon is selected in the Marker state, if the number of times the previous form has been caught is greater than the lock value, the Pokémon is accepted.
-
-As an example, assume three forms $X$, $Y$ and $Z$ where $Y$ is the evolution of $X$ and $Z$ is the evolution of $Y$. Also, assume $C_{F}$ and $L_{F}$ to be the number of times the form $F$ has been caught and the lock value of the form $F$, respectively. Since $X$ is the base form, $L_{X}=0$. If $L_{Y}=y$, it means that the form $Y$ will not appear while $C_{X}<y$. Similarly, if $L_{Z}=z$, the form $Z$ will not appear while $C_{Y}<z$.

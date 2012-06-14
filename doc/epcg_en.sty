@@ -1,0 +1,185 @@
+% ---------------------------------------------------------------
+%
+% $Id: epcg_en.sty,v 1.0 2002  Manuel Fonseca$
+%
+% by mjf@inesc-id.pt
+%
+% Adapted from latex8.sty by Paolo.Ienne@di.epfl.ch
+%
+% ---------------------------------------------------------------
+% with LaTeX2e:
+% =============
+%
+% use as
+%   \documentclass[times,10pt,twocolumn]{article}
+%   \usepackage{epcg_en}
+%   \usepackage{times}
+%
+% ---------------------------------------------------------------
+
+% with LaTeX 2.09:
+% ================
+%
+% use as
+%   \documentstyle[times,art10,twocolumn,epcg_en]{article}
+%
+% ---------------------------------------------------------------
+% with both versions:
+% ===================
+%
+% specify \pagestyle{empty} to omit page numbers in the final
+% version
+%
+% specify references as
+%   \bibliographystyle{plain}
+%   \bibliography{...your files...}
+%
+% use Section{} , SubSection and SubSubSection
+% instead of standard section{} , subsection{} and subsubsection{}
+%
+% ---------------------------------------------------------------
+
+\typeout{Proceedings Style `epcg_en.sty'.}
+
+% ten point helvetica bold required for captions
+% in some sites the name of the helvetica bold font may differ,
+% change the name here:
+%\font\tenhv  = ptmb scaled 1100
+\font\tenhv  = phvb at 10pt
+
+% eleven point times bold required for second-order headings
+%\font\elvbf  = ptmb scaled 1100
+\font\elvbf  = phvb at 10pt
+
+% set dimensions of columns, gap between columns, and paragraph indent
+\setlength{\textheight}{24.7cm}
+\setlength{\textwidth}{17.24cm}
+\setlength{\columnsep}{0.84cm}
+\setlength{\topmargin}{-1mm}
+\setlength{\headheight}{0in}
+\setlength{\headsep}{0in}
+\setlength{\parindent}{0pc}
+\setlength{\parskip}{4pt}
+\setlength{\oddsidemargin}{-6mm}
+%\setlength{\evensidemargin}{-.304in}
+
+% memento from size10.clo
+% \normalsize{\@setfontsize\normalsize\@xpt\@xiipt}
+% \small{\@setfontsize\small\@ixpt{11}}
+% \footnotesize{\@setfontsize\footnotesize\@viiipt{9.5}}
+% \scriptsize{\@setfontsize\scriptsize\@viipt\@viiipt}
+% \tiny{\@setfontsize\tiny\@vpt\@vipt}
+% \large{\@setfontsize\large\@xiipt{14}}
+% \Large{\@setfontsize\Large\@xivpt{18}}
+% \LARGE{\@setfontsize\LARGE\@xviipt{22}}
+% \huge{\@setfontsize\huge\@xxpt{25}}
+% \Huge{\@setfontsize\Huge\@xxvpt{30}}
+
+\def\@maketitle
+   {
+   \newpage
+   \null
+   \vskip -0.3cm
+   \begin{center}
+      {\LARGE \bf \@title \par}
+      % additional two empty lines at the end of the title
+      \vspace*{24pt}
+      {
+      \large
+      \lineskip .5em
+      \begin{tabular}[t]{c}
+         \@author
+      \end{tabular}
+      \par
+      }
+      % additional small space at the end of the author name
+      \vskip .5em
+      {
+       \large
+      \begin{tabular}[t]{c}
+         \@affiliation
+      \end{tabular}
+      \par
+      \ifx \@empty \@email
+      \else
+         \begin{tabular}{r@{~}l}
+            E-mail: & {\tt \@email}
+         \end{tabular}
+         \par
+      \fi
+      }
+      % additional empty line at the end of the title block 
+      \vspace*{12pt} 
+      {
+      \begin{tabular*}{17.2cm}{c}
+      \hline
+      \newline
+      \end{tabular*}
+      \begin{minipage}[b]{16.2cm}
+      \noindent{\normalsize\bf \textsf{Abstract\\}}%
+      \it%
+      \@abstract \\
+
+	  \ifx \@empty \@additionalabstract
+      \else
+	     \noindent{\normalsize\bf \textsf{\@additionalabstracttitle\\}}
+         \@additionalabstract \\
+      \fi
+	  
+      \noindent{\normalsize\bf \textsf{Keywords}\\}%
+      \@keywords
+      \end{minipage}
+      \vspace*{5mm}
+      \begin{tabular*}{17.2cm}{c}
+      \hline
+      \end{tabular*}
+      }
+   \end{center}
+   } 
+
+\def\affiliation#1{\gdef\@affiliation{#1}} \gdef\@affiliation{}
+
+\def\email#1{\gdef\@email{#1}}
+\gdef\@email{}
+
+
+\def\abstract#1{\gdef\@abstract{#1}} \gdef\@abstract{}
+\def\additionalabstracttitle#1{\gdef\@additionalabstracttitle{#1}} \gdef\@additionalabstracttitle{}
+\def\additionalabstract#1{\gdef\@additionalabstract{#1}} \gdef\@additionalabstract{}
+\def\keywords#1{\gdef\@keywords{#1}} \gdef\@keywords{}
+
+\newlength{\@ctmp}
+\newlength{\@figindent}
+\setlength{\@figindent}{1pc}
+
+\long\def\@makecaption#1#2{
+   \vskip 10pt
+   \setbox\@tempboxa\hbox{\tenhv\noindent #1.~#2} 
+   \setlength{\@ctmp}{\hsize}
+   \addtolength{\@ctmp}{-\@figindent}\addtolength{\@ctmp}{-\@figindent} 
+   % IF longer than one indented paragraph line
+   \ifdim \wd\@tempboxa >\@ctmp
+      % THEN set as an indented paragraph
+      \begin{list}{}{\leftmargin\@figindent \rightmargin\leftmargin} 
+         \item[]\tenhv #1.~#2\par
+      \end{list}
+   \else
+      % ELSE center
+      \hbox to\hsize{\hfil\box\@tempboxa\hfil} 
+   \fi}
+
+% correct heading spacing and type
+\def\section{\@startsection {section}{1}{\z@}
+   {2pt plus 2pt minus 2pt}{2pt plus 2pt minus 2pt} {\scshape \elvbf}}
+\def\subsection{\@startsection {subsection}{2}{\z@}
+   {2pt plus 2pt minus 2pt}{2pt plus 2pt minus 2pt} {\elvbf}}
+\def\subsubsection{\@startsection {subsubsection}{3}{\z@}
+   {2pt plus 2pt minus 2pt}{2pt plus 2pt minus 2pt} {\tenhv}}
+
+% add the period after section numbers
+\newcommand{\Section}[1]{\section{\hskip -1em.~#1}}
+\newcommand{\SubSection}[1]{\subsection{\hskip -1em.~#1}}
+\newcommand{\SubSubSection}[1]{\subsubsection{\hskip -1em.~#1}}
+
+% end of file epcg_en.sty
+% ---------------------------------------------------------------
