@@ -33,7 +33,7 @@ function pokeInit () {
 
 	//	GUI
 	pokeDex = document.createElement("table");
-	pokeDex.style.cssFloat = "right";
+	//pokeDex.style.cssFloat = "right";
 	
 	for (var i in pokeDB) {
 		var pokemon = pokeDB[i];
@@ -49,7 +49,7 @@ function pokeInit () {
 	row.insertCell(-1).innerHTML = "Pokémon";
 	row.insertCell(-1).innerHTML = "Caught";
 
-	document.body.appendChild(pokeDex);
+	document.getElementById('pokedex_container').appendChild(pokeDex);
 }
 
 // -->

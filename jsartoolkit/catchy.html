@@ -5,6 +5,51 @@
 
 		<title>Basic Detector</title>
 
+		<!-- CSS -->
+		<style type="text/css">
+			body {
+				width: 100%;
+				background-image: url('images/_background.jpg');
+				background-size: 500px;
+				background-color: #F7DE84;
+				background-position: bottom right;
+				background-repeat: no-repeat;
+				font-family: 'Courier';
+				font-weight: bold;
+				height: 100%;
+			}
+
+			#main {
+				margin: 10px;
+				width: 100%;
+			}
+
+			#video_container {
+				float: left;
+				padding: 10px;
+			}
+
+			#podekex_container {
+				float: left;
+				padding: 10px;
+			}
+
+			#pokedex_container table {
+				border-spacing=0px;
+				border-collapse: 0;
+				border: solid 1px;
+				padding-top: 10px;
+			}
+
+			#pokedex_container thead td {
+				border-bottom: solid 1px;
+			}
+
+			#pokedex_container tr td:last-child {
+				text-align: right;
+			}
+		</style>
+
 		<!--    LIBRARIES    -->
 		<script type="text/javascript" src="js/JSARToolKit.js"></script>
 		<script type="text/javascript" src="js/Three.js"></script>
@@ -310,6 +355,12 @@
 				cnvsVideo.width = video.width;
 				cnvsVideo.height = video.height;
 
+				img = new Image()
+				img.src = 'images/_gyarados-bob.jpg'
+				img.width = 640
+				img.height = 480
+				//document.getElementById('video_container').appendChild(img)
+
 				//	array to temporary hold the matrix data
 				arMatTemp = new Float32Array(16);
 
@@ -391,12 +442,15 @@
 				var audio = document.createElement("audio");
 				audio.loop = true;
 				audio.autoplay = true;
-				audio.src = "audio/champion.mp3";
+				//audio.src = "audio/champion.mp3";
 
 				//	add visual elements
 				// document.body.appendChild(video);
 				// document.body.appendChild(cnvsVideo);
-				document.body.appendChild(renderer.domElement);
+
+				document.getElementById('video_container').appendChild(renderer.domElement);
+
+				//cnvsVideo.style.display = 'none'
 				document.body.appendChild(audio);
 
 				window.setInterval(windowFrame, frameGapInMillis);
@@ -436,5 +490,13 @@
 	</head>
 
 	<body>
+		<div id="main">
+			<div id="header"></div>
+
+			<div id="content">
+				<div id="video_container"></div>
+				<div id="pokedex_container"></div>
+			</div>
+		</div>
 	</body>
 </html>
